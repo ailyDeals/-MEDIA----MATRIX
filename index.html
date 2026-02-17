@@ -211,31 +211,360 @@
             document.getElementById('balance-display').innerText = (state.balance || 0).toFixed(2);
             document.getElementById('profit-display').innerText = (state.profit || 0).toFixed(2);
             document.getElementById('invested-display').innerText = (state.invested || 0).toFixed(2);
-            document.getElementById('user-id-badge').innerText = state.userId;
-            document.getElementById('u-name').innerText = state.name;
-            document.getElementById('u-phone').innerText = state.phone;
-            renderPortfolio(); renderWithdrawStatus();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>​🪙 GOLD-MINE BD 🪙 </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;900&display=swap');
+        body { font-family: 'Outfit', sans-serif; background: #020617; color: #f8fafc; overflow-x: hidden; }
+        
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); }
+        .gold-gradient { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); position: relative; overflow: hidden; }
+        
+        /* Premium Button Shine Effect */
+        .gold-gradient::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: rgba(255,255,255,0.2); transform: rotate(45deg); transition: 0.6s;
+        }
+        .gold-gradient:hover::after { left: 120%; }
+
+        .nav-active { color: #fbbf24; transform: translateY(-5px); text-shadow: 0 0 15px rgba(251, 191, 36, 0.5); }
+        .page { display: none; }
+        .page.active { display: block; animation: slideUp 0.4s ease-out; }
+        
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .card-glow { box-shadow: 0 0 20px rgba(251, 191, 36, 0.05); border: 1px solid rgba(251, 191, 36, 0.1); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        #notice-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
+    </style>
+</head>
+<body class="no-scrollbar">
+
+    <div id="notice-modal" class="flex">
+        <div class="glass p-8 rounded-[2.5rem] max-w-sm w-full text-center border-amber-500/30 animate__animated animate__zoomIn">
+            <div class="w-20 h-20 gold-gradient rounded-full flex items-center justify-center text-white text-3xl mx-auto mb-6 shadow-2xl">
+                <i class="fas fa-bullhorn"></i>
+            </div>
+            <h3 class="text-2xl font-black mb-3 text-white">Announcement</h3>
+            <p id="notice-text" class="text-slate-400 text-sm leading-relaxed mb-8">Loading updates...</p>
+            <button onclick="closeNotice()" class="w-full py-4 gold-gradient text-white font-black rounded-2xl shadow-xl uppercase tracking-widest">Understand</button>
+        </div>
+    </div>
+
+    <div id="live-toast" class="fixed bottom-24 left-4 z-[1000] hidden animate__animated animate__fadeInUp">
+        <div class="glass p-3 rounded-2xl flex items-center gap-3 shadow-2xl border-amber-500/20">
+            <div class="w-10 h-10 gold-gradient rounded-full flex items-center justify-center text-white shadow-lg"><i class="fas fa-bolt text-xs"></i></div>
+            <div>
+                <p id="toast-text" class="text-[11px] font-bold text-white"></p>
+                <p class="text-[9px] text-green-500 font-black uppercase">Transaction Verified</p>
+            </div>
+        </div>
+    </div>
+
+    <section id="auth-page" class="page active min-h-screen flex flex-col items-center justify-center p-8">
+        <div class="w-24 h-24 gold-gradient rounded-[2rem] flex items-center justify-center text-white text-5xl mb-8 shadow-2xl animate__animated animate__bounceIn">
+            <i class="fas fa-gem"></i>
+        </div>
+        <h1 class="text-4xl font-black mb-2 tracking-tight">GOLD-MINE <span class="text-amber-500">BD</span></h1>
+        <p class="text-slate-500 text-sm mb-12 font-medium">Digital Mining Revolution</p>
+        
+        <div class="w-full max-w-sm space-y-4">
+            <div id="reg-fields" class="hidden">
+                <input id="auth-name" type="text" placeholder="Full Name" class="w-full p-4 glass rounded-2xl outline-none border-transparent focus:border-amber-500 text-white transition-all">
+            </div>
+            <input id="auth-mobile" type="tel" placeholder="Mobile Number" class="w-full p-4 glass rounded-2xl outline-none border-transparent focus:border-amber-500 text-white transition-all">
+            <input id="auth-pin" type="password" placeholder="4-Digit PIN" maxlength="4" class="w-full p-4 glass rounded-2xl outline-none border-transparent focus:border-amber-500 text-white transition-all">
+            
+            <button onclick="handleAuth()" id="auth-btn" class="w-full gold-gradient text-white font-black py-5 rounded-2xl shadow-lg uppercase tracking-widest mt-4">Login Account</button>
+            
+            <p id="switch-auth" class="text-center text-xs text-slate-400 mt-8 cursor-pointer" onclick="toggleAuthMode()">
+                Don't have an account? <span class="text-amber-500 font-bold ml-1">Register Now</span>
+            </p>
+        </div>
+    </section>
+
+    <main id="main-app" class="hidden min-h-screen pb-32">
+        <header class="glass p-6 sticky top-0 z-50 flex justify-between items-center border-b border-white/5">
+            <div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Available Balance</p>
+                <h2 class="text-3xl font-black text-white">৳ <span id="balance-display">0.00</span></h2>
+            </div>
+            <div class="flex flex-col items-end">
+                <span id="user-id-badge" class="text-[10px] bg-amber-500/10 text-amber-500 font-black px-4 py-1.5 rounded-full border border-amber-500/20 shadow-inner">ID-XXXX</span>
+            </div>
+        </header>
+
+        <div id="home" class="page p-6">
+            <div class="gold-gradient rounded-[2.5rem] p-8 mb-10 shadow-2xl shadow-amber-900/20 relative overflow-hidden">
+                <div class="relative z-10">
+                    <p class="text-amber-100/80 text-xs font-bold uppercase tracking-widest mb-2">Total Accumulated Profit</p>
+                    <h3 class="text-5xl font-black text-white mb-8">৳ <span id="profit-display">0.00</span></h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-black/20 backdrop-blur-md p-4 rounded-2xl">
+                            <p class="text-[9px] text-amber-200 font-bold uppercase mb-1">Total Assets</p>
+                            <p class="font-black text-white text-lg">৳ <span id="invested-display">0.00</span></p>
+                        </div>
+                        <div class="bg-black/20 backdrop-blur-md p-4 rounded-2xl">
+                            <p class="text-[9px] text-amber-200 font-bold uppercase mb-1">Platform Rank</p>
+                            <p class="font-black text-white text-[10px] mt-1 tracking-tighter">GOLD PRO MEMBER</p>
+                        </div>
+                    </div>
+                </div>
+                <i class="fas fa-chart-line absolute -bottom-4 -right-4 text-white/10 text-9xl"></i>
+            </div>
+
+            <h4 class="font-black text-xl mb-6 flex items-center gap-3">
+                <span class="w-2 h-8 gold-gradient rounded-full"></span>
+                Premium Mining Plans
+            </h4>
+            <div id="plans-container" class="space-y-6"></div>
+        </div>
+
+        <div id="portfolio" class="page p-6">
+            <h3 class="text-2xl font-black mb-8">My Active Nodes</h3>
+            <div id="portfolio-list" class="space-y-4"></div>
+        </div>
+
+        <div id="deposit" class="page p-6">
+            <h3 class="text-2xl font-black mb-6">Wallet Recharge</h3>
+            <div class="flex gap-3 mb-6">
+                <button onclick="setMethod('bKash')" id="m-bkash" class="flex-1 py-4 glass rounded-2xl text-sm font-black border border-white/5 transition-all">bKash</button>
+                <button onclick="setMethod('Nagad')" id="m-nagad" class="flex-1 py-4 glass rounded-2xl text-sm font-black border border-white/5 transition-all">Nagad</button>
+            </div>
+            
+            <div class="glass p-8 rounded-[2.5rem] space-y-6 card-glow">
+                <div class="p-5 bg-white/5 rounded-2xl flex justify-between items-center border border-white/10">
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Official Receiver</p>
+                        <input id="admin-number" value="Select Method" readonly class="bg-transparent font-black text-amber-500 outline-none text-lg w-full">
+                    </div>
+                    <button onclick="copyNumber()" class="gold-gradient text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-lg">COPY</button>
+                </div>
+                
+                <div class="space-y-4">
+                    <input id="dep-amt" type="number" placeholder="Enter Amount (Min 200)" class="w-full p-5 glass rounded-2xl outline-none font-bold border-transparent focus:border-amber-500 transition-all">
+                    <input id="dep-tx" type="text" placeholder="Enter Transaction ID" class="w-full p-5 glass rounded-2xl outline-none font-bold border-transparent focus:border-amber-500 transition-all uppercase">
+                </div>
+                
+                <button onclick="requestDeposit()" class="w-full py-5 gold-gradient text-white font-black rounded-2xl shadow-xl uppercase tracking-widest">Submit Deposit</button>
+            </div>
+        </div>
+
+        <div id="profile" class="page p-6">
+            <div class="glass p-8 rounded-[2.5rem] text-center mb-8 card-glow">
+                <div class="w-20 h-20 gold-gradient rounded-full mx-auto mb-4 flex items-center justify-center text-3xl shadow-2xl">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <h2 id="u-name" class="text-2xl font-black text-white">Loading...</h2>
+                <p id="u-phone" class="text-xs text-amber-500 font-bold tracking-widest mt-1">VERIFIED MEMBER</p>
+            </div>
+
+            <div class="glass p-6 rounded-[2rem] mb-8 border-dashed border-amber-500/30">
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-3">Your Referral Link</p>
+                <div class="flex gap-2">
+                    <input id="ref-link" readonly class="bg-white/5 p-3 rounded-xl text-[10px] flex-1 outline-none text-slate-300">
+                    <button onclick="copyReferral()" class="bg-amber-500/20 text-amber-500 px-4 rounded-xl text-[10px] font-black">COPY</button>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <a href="#" id="tg-link" target="_blank" class="glass p-5 rounded-3xl flex flex-col items-center gap-3 hover:bg-white/5 transition-all">
+                    <i class="fab fa-telegram text-3xl text-blue-400"></i>
+                    <span class="text-[10px] font-black uppercase tracking-tighter">Community</span>
+                </a>
+                <a href="#" id="wa-link" target="_blank" class="glass p-5 rounded-3xl flex flex-col items-center gap-3 hover:bg-white/5 transition-all">
+                    <i class="fab fa-whatsapp text-3xl text-green-400"></i>
+                    <span class="text-[10px] font-black uppercase tracking-tighter">Live Support</span>
+                </a>
+            </div>
+
+            <div class="glass p-8 rounded-[2.5rem] space-y-6">
+                <h4 class="font-black text-lg flex items-center gap-2"><i class="fas fa-hand-holding-usd text-amber-500"></i> Withdrawal</h4>
+                <div class="space-y-4">
+                    <input id="w-amt" type="number" placeholder="Amount (Min 600)" class="w-full p-5 glass rounded-2xl outline-none border-transparent focus:border-amber-500">
+                    <input id="w-num" type="tel" placeholder="Receiver Number" class="w-full p-5 glass rounded-2xl outline-none border-transparent focus:border-amber-500">
+                </div>
+                <button onclick="requestWithdraw()" class="w-full py-5 bg-white text-slate-900 font-black rounded-2xl uppercase tracking-widest shadow-xl">Process Cashout</button>
+            </div>
+
+            <div id="withdraw-status-list" class="space-y-3 mt-8"></div>
+            
+            <button onclick="logout()" class="w-full py-5 text-rose-400 font-black glass rounded-2xl mt-12 border-rose-500/10">
+                <i class="fas fa-sign-out-alt mr-2"></i> LOGOUT SESSION
+            </button>
+        </div>
+
+        <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/5 flex justify-around p-5 z-50 rounded-t-[2.5rem] shadow-2xl">
+            <button onclick="navigate('home')" class="nav-btn p-3 nav-active" data-page="home"><i class="fas fa-th-large text-xl"></i></button>
+            <button onclick="navigate('portfolio')" class="nav-btn p-3 text-slate-500" data-page="portfolio"><i class="fas fa-microchip text-xl"></i></button>
+            <button onclick="navigate('deposit')" class="nav-btn p-3 text-slate-500" data-page="deposit"><i class="fas fa-plus-circle text-2xl gold-gradient text-white rounded-full w-12 h-12 flex items-center justify-center -translate-y-6 shadow-xl shadow-amber-500/20"></i></button>
+            <button onclick="navigate('profile')" class="nav-btn p-3 text-slate-500" data-page="profile"><i class="fas fa-user-astronaut text-xl"></i></button>
+        </nav>
+    </main>
+
+    <script>
+        // FIREBASE CONFIGURATION (Use your own config)
+        const firebaseConfig = { 
+            apiKey: "AIzaSyDXD_ANF89k7StmGJ1Xz55nGUOB3ajMoF4", 
+            authDomain: "smartinvestpro-c659f.firebaseapp.com", 
+            databaseURL: "https://smartinvestpro-c659f-default-rtdb.firebaseio.com", 
+            projectId: "smartinvestpro-c659f", 
+            storageBucket: "smartinvestpro-c659f.firebasestorage.app", 
+            messagingSenderId: "294616388438", 
+            appId: "1:294616388438:web:54250014b8625fb50c3cf7" 
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let state = null;
+        let isLoginMode = true;
+        let currentMethod = null;
+
+        function closeNotice() { document.getElementById('notice-modal').style.display = 'none'; }
+        
+        function toggleAuthMode() { 
+            isLoginMode = !isLoginMode; 
+            document.getElementById('reg-fields').classList.toggle('hidden');
+            document.getElementById('auth-btn').innerText = isLoginMode ? "Login Account" : "Create Account";
+            document.getElementById('switch-auth').innerHTML = isLoginMode ? "Don't have an account? <span class='text-amber-500 font-bold'>Register Now</span>" : "Already have account? <span class='text-amber-500 font-bold'>Login</span>";
         }
 
-        // DYNAMIC PLANS FROM ADMIN
+        window.onload = async () => {
+            const savedPhone = localStorage.getItem('logged_phone');
+            if(savedPhone) {
+                const snap = await db.ref('users/' + savedPhone).once('value');
+                if(snap.exists()){ 
+                    state = snap.val(); 
+                    loginSuccess(); 
+                }
+            }
+        };
+
+        async function handleAuth() {
+            const mobile = document.getElementById('auth-mobile').value.trim();
+            const pin = document.getElementById('auth-pin').value.trim();
+            
+            if(mobile.length !== 11) return alert("Enter valid 11-digit number");
+            if(pin.length < 4) return alert("PIN must be 4 digits");
+
+            if(!isLoginMode) {
+                const name = document.getElementById('auth-name').value.trim();
+                if(!name) return alert("Full Name Required");
+                
+                const checkUser = await db.ref('users/' + mobile).once('value');
+                if(checkUser.exists()) return alert("User already exists!");
+
+                state = { 
+                    name, phone: mobile, pin, 
+                    userId: 'GM-'+Math.floor(100000+Math.random()*899999), 
+                    balance: 0, invested: 0, profit: 0, 
+                    myPlans: [], withdraws: [],
+                    lastClaim: Date.now() 
+                };
+                await db.ref('users/' + mobile).set(state);
+            } else {
+                const snap = await db.ref('users/' + mobile).once('value');
+                if(!snap.exists() || snap.val().pin !== pin) return alert("Wrong Credentials");
+                state = snap.val();
+            }
+            localStorage.setItem('logged_phone', mobile);
+            loginSuccess();
+        }
+
+        function loginSuccess() {
+            document.getElementById('auth-page').style.display = 'none';
+            document.getElementById('main-app').classList.remove('hidden');
+            
+            db.ref('users/' + state.phone).on('value', snap => { 
+                if(snap.exists()) {
+                    state = snap.val(); 
+                    refreshUI(); 
+                    checkAutoProfit(); 
+                }
+            });
+
+            db.ref('appSettings').on('value', s => {
+                const data = s.val() || {};
+                document.getElementById('notice-text').innerText = data.notice || "Welcome to GOLD-MINE Digital Era!";
+                document.getElementById('notice-modal').style.display = 'flex';
+                document.getElementById('tg-link').href = data.telegram || "#";
+                document.getElementById('wa-link').href = "https://wa.me/" + (data.whatsapp || "");
+            });
+
+            document.getElementById('ref-link').value = `https://goldmine-bd.com/ref=${state.phone}`;
+            navigate('home');
+        }
+
+        async function checkAutoProfit() {
+            if (!state.myPlans || state.myPlans.length === 0) return;
+            const now = Date.now();
+            const lastClaim = state.lastClaim || now;
+            const oneDay = 24 * 60 * 60 * 1000;
+            const daysPassed = Math.floor((now - lastClaim) / oneDay);
+
+            if (daysPassed >= 1) {
+                let dailyTotal = 0;
+                state.myPlans.forEach(p => dailyTotal += parseFloat(p.daily));
+                const totalEarnings = dailyTotal * daysPassed;
+                
+                await db.ref('users/' + state.phone).update({
+                    balance: (state.balance || 0) + totalEarnings,
+                    profit: (state.profit || 0) + totalEarnings,
+                    lastClaim: now
+                });
+            }
+        }
+
+        function refreshUI() {
+            document.getElementById('balance-display').innerText = (state.balance || 0).toFixed(2);
+            document.getElementById('profit-display').innerText = (state.profit || 0).toFixed(2);
+            document.getElementById('invested-display').innerText = (state.invested || 0).toFixed(2);
+            document.getElementById('user-id-badge').innerText = state.userId;
+            document.getElementById('u-name').innerText = state.name;
+            document.getElementById('u-phone').innerText = "+88 " + state.phone;
+            renderPortfolio(); 
+            renderWithdrawStatus();
+        }
+
         function renderPlans() {
             db.ref('appPlans').once('value', snap => {
                 let html = '';
                 snap.forEach(child => {
                     const p = child.val();
                     html += `
-                    <div class="glass p-5 rounded-[2rem] flex flex-col gap-4 border-slate-800">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 bg-amber-200/10 rounded-2xl flex items-center justify-center text-2xl">${p.icon}</div>
-                                <div><h4 class="font-black text-white text-sm">${p.title}</h4><p class="text-[9px] text-slate-200 uppercase">Validity: ${p.days} Days</p></div>
+                    <div class="glass p-6 rounded-[2.5rem] card-glow border-white/5 relative overflow-hidden group">
+                        <div class="flex justify-between items-start mb-6">
+                            <div class="flex items-center gap-4">
+                                <div class="w-14 h-14 gold-gradient rounded-2xl flex items-center justify-center text-2xl shadow-lg">${p.icon || '💎'}</div>
+                                <div>
+                                    <h4 class="font-black text-white">${p.title}</h4>
+                                    <p class="text-[10px] text-green-500 font-black uppercase tracking-widest mt-1">Status: Stable</p>
+                                </div>
                             </div>
-                            <div class="text-right"><p class="text-[9px] text-green-500 font-black uppercase">Daily Profit</p><p class="text-white font-black">৳${p.daily}</p></div>
+                            <div class="text-right">
+                                <p class="text-[9px] text-slate-400 font-bold uppercase">Daily Yield</p>
+                                <p class="text-xl font-black text-amber-500">৳${p.daily}</p>
+                            </div>
                         </div>
-                        <button onclick="buyPlan('${child.key}')" class="w-full gold-gradient text-white py-3 rounded-2xl text-xs font-black shadow-lg">Purchase for ৳${p.price}</button>
+                        <div class="flex justify-between items-center bg-white/5 p-4 rounded-2xl mb-6">
+                            <div class="text-center"><p class="text-[8px] text-slate-400 font-bold uppercase">Validity</p><p class="text-xs font-black text-white">${p.days} Days</p></div>
+                            <div class="text-center"><p class="text-[8px] text-slate-400 font-bold uppercase">Return</p><p class="text-xs font-black text-white">৳${p.daily * p.days}</p></div>
+                            <div class="text-center"><p class="text-[8px] text-slate-400 font-bold uppercase">Risk</p><p class="text-xs font-black text-green-400">Low</p></div>
+                        </div>
+                        <button onclick="buyPlan('${child.key}')" class="w-full gold-gradient text-white py-4 rounded-xl text-xs font-black shadow-xl group-hover:scale-[1.02] transition-transform">ACTIVATE MINING @ ৳${p.price}</button>
                     </div>`;
                 });
-                document.getElementById('plans-container').innerHTML = html || "<p class='text-center opacity-20 py-10'>No Plans Available</p>";
+                document.getElementById('plans-container').innerHTML = html || "<p class='text-center opacity-20 py-10'>No Active Nodes</p>";
             });
         }
 
@@ -244,72 +573,124 @@
             const p = pSnap.val();
             if(state.balance >= p.price) {
                 const myPlans = state.myPlans || [];
-                myPlans.push({ title: p.title, daily: p.daily, price: p.price, date: new Date().toLocaleDateString(), icon: p.icon });
-                await db.ref('users/' + state.phone).update({ balance: state.balance - p.price, invested: (state.invested || 0) + p.price, myPlans: myPlans });
-                alert("Mining Activated!"); navigate('portfolio');
-            } else { alert("Insufficient Balance!"); navigate('deposit'); }
+                myPlans.push({ 
+                    title: p.title, daily: p.daily, price: p.price, 
+                    date: new Date().toLocaleDateString(), icon: p.icon || '💎' 
+                });
+                await db.ref('users/' + state.phone).update({ 
+                    balance: state.balance - p.price, 
+                    invested: (state.invested || 0) + p.price, 
+                    myPlans: myPlans, lastClaim: Date.now() 
+                });
+                alert("Mining Node Activated!"); navigate('portfolio');
+            } else { 
+                alert("Insufficient Balance!"); navigate('deposit'); 
+            }
         }
 
         function renderPortfolio() {
             const list = state.myPlans || [];
             document.getElementById('portfolio-list').innerHTML = list.map(i => `
-                <div class="glass p-4 rounded-3xl border-slate-800 flex justify-between items-center">
-                    <div class="flex items-center gap-3"><span class="text-2xl">${i.icon}</span>
-                        <div><h4 class="font-black text-white text-sm">${i.title}</h4><p class="text-[8px] text-slate-200 uppercase">Running</p></div>
+                <div class="glass p-5 rounded-3xl border-white/5 flex justify-between items-center card-glow">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 gold-gradient rounded-xl flex items-center justify-center text-xl shadow-lg">${i.icon}</div>
+                        <div>
+                            <h4 class="font-black text-white text-sm">${i.title}</h4>
+                            <p class="text-[9px] text-green-400 font-black uppercase flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span> Mining Now
+                            </p>
+                        </div>
                     </div>
-                    <div class="text-green-200 font-black text-[9px] uppercase tracking-widest">Active Node</div>
-                </div>`).join('') || "<p class='text-center py-20 opacity-20 text-[9px]'>Nodes Offline</p>";
+                    <div class="text-right">
+                        <p class="text-[8px] text-slate-400 font-bold uppercase">Revenue</p>
+                        <p class="text-sm font-black text-white">৳${i.daily}/Day</p>
+                    </div>
+                </div>`).reverse().join('') || "<p class='text-center py-20 opacity-20'>No Active Hardware</p>";
         }
 
         function navigate(pId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pId).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.replace('nav-active', 'text-slate-200'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.replace('nav-active', 'text-slate-500'));
             const btn = document.querySelector(`[data-page="${pId}"]`);
-            if(btn) btn.classList.replace('text-slate-200', 'nav-active');
+            if(btn && pId !== 'deposit') btn.classList.replace('text-slate-500', 'nav-active');
             if(pId === 'home') renderPlans();
         }
 
         function setMethod(m) {
-            document.getElementById('m-bkash').className = 'flex-1 p-4 glass rounded-2xl text-xs font-black border border-slate-700';
-            document.getElementById('m-nagad').className = 'flex-1 p-4 glass rounded-2xl text-xs font-black border border-slate-700';
-            document.getElementById('m-'+m.toLowerCase()).classList.add('bg-amber-200');
-            db.ref('appSettings').once('value', s => { document.getElementById('admin-number').value = s.val()[m.toLowerCase()] || '01XXXXXXXXX'; });
-            window.currentMethod = m;
+            currentMethod = m;
+            document.getElementById('m-bkash').className = 'flex-1 py-4 glass rounded-2xl text-sm font-black border border-white/5';
+            document.getElementById('m-nagad').className = 'flex-1 py-4 glass rounded-2xl text-sm font-black border border-white/5';
+            document.getElementById('m-'+m.toLowerCase()).classList.add('gold-gradient', 'text-white');
+            db.ref('appSettings').once('value', s => { 
+                document.getElementById('admin-number').value = s.val()[m.toLowerCase()] || 'No Number Set'; 
+            });
         }
 
-        function copyNumber() { navigator.clipboard.writeText(document.getElementById('admin-number').value); alert("Copied!"); }
+        function copyNumber() { 
+            const num = document.getElementById('admin-number').value;
+            if(num === "Select Method") return;
+            navigator.clipboard.writeText(num); alert("Number Copied!"); 
+        }
+
+        function copyReferral() {
+            const link = document.getElementById('ref-link').value;
+            navigator.clipboard.writeText(link); alert("Link Copied!");
+        }
+
         async function requestDeposit() {
             const amt = parseFloat(document.getElementById('dep-amt').value);
-            const tx = document.getElementById('dep-tx').value;
-            if(!window.currentMethod || amt < 200) return alert("Min 200 & Select Method");
-            await db.ref('requests/deposits').push({ phone: state.phone, name: state.name, amount: amt, tx: tx, method: window.currentMethod, status: 'Pending', date: new Date().toLocaleString() });
-            alert("Submitted!"); navigate('home');
+            const tx = document.getElementById('dep-tx').value.trim();
+            if(!currentMethod || isNaN(amt) || amt < 200 || tx.length < 6) return alert("Fill all details correctly!");
+
+            await db.ref('requests/deposits').push({ 
+                phone: state.phone, name: state.name, 
+                amount: amt, tx: tx, method: currentMethod, 
+                status: 'Pending', date: new Date().toLocaleString() 
+            });
+            alert("Verification Request Submitted!"); navigate('home');
         }
 
         async function requestWithdraw() {
             const amt = parseFloat(document.getElementById('w-amt').value);
-            const num = document.getElementById('w-num').value;
-            if(amt >= 600 && amt <= state.balance) {
-                const withdraws = state.withdraws || [];
-                withdraws.push({ amount: amt, status: 'Pending', date: new Date().toLocaleDateString() });
-                await db.ref('requests/withdraws').push({ phone: state.phone, amount: amt, receiver: num, status: 'Pending' });
-                await db.ref('users/' + state.phone).update({ balance: state.balance - amt, withdraws: withdraws });
-                alert("Withdraw Request Sent!");
-            } else { alert("Min 600 or Low Balance!"); }
+            const num = document.getElementById('w-num').value.trim();
+            if(isNaN(amt) || amt < 600 || amt > state.balance || num.length !== 11) return alert("Invalid Amount or Number");
+
+            const withdraws = state.withdraws || [];
+            const req = { amount: amt, receiver: num, status: 'Pending', date: new Date().toLocaleString() };
+            withdraws.push(req);
+            await db.ref('requests/withdraws').push({ ...req, phone: state.phone });
+            await db.ref('users/' + state.phone).update({ balance: state.balance - amt, withdraws: withdraws });
+            alert("Withdrawal Processed!");
         }
 
         function renderWithdrawStatus() {
             const list = state.withdraws || [];
-            document.getElementById('withdraw-status-list').innerHTML = list.map(w => `<div class="glass p-4 rounded-2xl flex justify-between items-center text-[10px] font-bold"><span>৳${w.amount}</span><span class="text-amber-500">${w.status}</span></div>`).join('');
+            document.getElementById('withdraw-status-list').innerHTML = list.map(w => `
+                <div class="glass p-5 rounded-2xl flex justify-between items-center card-glow border-white/5">
+                    <div>
+                        <p class="text-[10px] font-black text-white">CASH OUT ৳${w.amount}</p>
+                        <p class="text-[8px] text-slate-500 font-bold uppercase mt-0.5">${w.date}</p>
+                    </div>
+                    <span class="text-[9px] font-black uppercase px-3 py-1 rounded-full ${w.status === 'Pending' ? 'bg-amber-500/10 text-amber-500' : 'bg-green-500/10 text-green-500'}">
+                        ${w.status}
+                    </span>
+                </div>`).reverse().join('');
         }
-        function logout() { localStorage.clear(); location.reload(); }
 
-        // Live Toast Random Data
+        function logout() { 
+            db.ref('users/' + state.phone).off();
+            localStorage.clear(); location.reload(); 
+        }
+
+        // Live Transactions Simulation
         setInterval(() => {
+            const names = ["Zakir", "Sumon", "Nipa", "Mitu", "Arif", "Hasan", "Rina", "Alvi"];
+            const amounts = [500, 1000, 2000, 5000, 10000];
+            const name = names[Math.floor(Math.random()*names.length)];
+            const amt = amounts[Math.floor(Math.random()*amounts.length)];
+            document.getElementById('toast-text').innerText = `${name}*** just deposited ৳${amt}`;
             const toast = document.getElementById('live-toast');
-            const userNames = ["Zakir", "Mitu", "Faruk", "Nipa", "Rashed", "Alvi", "Sumon"];
-            document.getElementById('toast-text').innerText = `${userNames[Math.floor(Math.random()*userNames.length)]}*** deposited ৳${[500,2000,5000][Math.floor(Math.random()*3)]}`;
             toast.style.display = 'block';
             setTimeout(() => { toast.style.display = 'none'; }, 4000);
         }, 15000);
