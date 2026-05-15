@@ -1,1228 +1,1193 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>​🪙 GOLD-MINE BD 🪙 </title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;900&display=swap');
-        
-        html, body { 
-            height: 100%; margin: 0; padding: 0; overflow: hidden; 
-            background: #020617; font-family: 'Outfit', sans-serif; color: #f8fafc;
-            user-select: none; -webkit-tap-highlight-color: transparent;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>GOLD-MINE PRO</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<style>
+:root {
+  --primary: #F0B429;
+  --primary-light: #FFD166;
+  --primary-dark: #C88400;
+  --primary-glow: rgba(240,180,41,0.18);
+  --bg: #0B0C10;
+  --bg2: #13141A;
+  --bg3: #1A1B23;
+  --bg4: #21222C;
+  --bg5: #2A2B38;
+  --text: #EEEEF5;
+  --text2: #A8A8C0;
+  --text3: #606078;
+  --green: #06D6A0;
+  --green-bg: rgba(6,214,160,0.10);
+  --red: #EF476F;
+  --red-bg: rgba(239,71,111,0.10);
+  --blue: #4CC9F0;
+  --blue-bg: rgba(76,201,240,0.10);
+  --purple: #9B5DE5;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --nav-h: 76px;
+  --header-h: 80px;
+  --radius: 22px;
+  --radius-sm: 14px;
+  --radius-xs: 10px;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body {
+  height:100%; background:var(--bg); font-family:'Outfit',sans-serif;
+  color:var(--text); overflow:hidden; user-select:none;
+  -webkit-font-smoothing:antialiased;
+}
+::-webkit-scrollbar { display:none; }
 
-        .app-frame { display: flex; flex-direction: column; height: 100vh; width: 100%; }
-        
-        .scroll-area { 
-            flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; 
-            padding-bottom: 120px; 
-        }
-        .scroll-area::-webkit-scrollbar { display: none; }
+/* ── APP SHELL ── */
+#app { display:flex; flex-direction:column; height:100vh; width:100%; position:relative; overflow:hidden; }
 
-        .glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); }
-        .gold-gradient { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); position: relative; overflow: hidden; }
-        
-        .btn-click:active { transform: scale(0.96); transition: 0.1s; }
-        .nav-active { color: #fbbf24; transform: translateY(-3px); text-shadow: 0 0 15px rgba(251, 191, 36, 0.4); }
-        
-        .page { display: none; }
-        .page.active { display: block; animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+/* ── SCROLL ── */
+.scroll-area {
+  flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  padding-bottom:calc(var(--nav-h) + 16px);
+  scroll-behavior:smooth;
+}
 
-        .plan-card {
-            background: linear-gradient(180deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.9) 100%);
-            border: 1px solid rgba(251, 191, 36, 0.15);
-            border-radius: 2rem;
-            padding: 1.5rem;
-            position: relative;
-        }
-        
-        /* ইনপুট বক্স ফিক্স */
-        input { 
-            user-select: text !important; 
-            -webkit-user-select: text !important;
-            cursor: text;
-        }
-    </style>
+/* ── PAGES ── */
+.page { display:none; }
+.page.active { display:block; animation:pageIn .3s cubic-bezier(.4,0,.2,1); }
+@keyframes pageIn { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── AUTH PAGE ── */
+#auth-page {
+  min-height:100vh; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; padding:32px 24px;
+  background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(240,180,41,0.12) 0%, transparent 60%),
+              radial-gradient(ellipse 60% 40% at 80% 100%, rgba(76,201,240,0.06) 0%, transparent 60%), var(--bg);
+  position:relative;
+}
+.auth-brand { text-align:center; margin-bottom:32px; }
+.auth-logo {
+  width:80px; height:80px; border-radius:26px; margin:0 auto 16px;
+  background:linear-gradient(135deg, var(--primary-light), var(--primary), var(--primary-dark));
+  display:flex; align-items:center; justify-content:center; font-size:34px;
+  box-shadow: 0 8px 40px rgba(240,180,41,0.35), 0 0 0 1px rgba(240,180,41,0.2);
+  animation:logoBounce .7s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes logoBounce { from { transform:scale(0.4) rotate(-15deg); opacity:0; } to { transform:scale(1) rotate(0); opacity:1; } }
+.auth-logo-title {
+  font-size:28px; font-weight:900; letter-spacing:-0.5px;
+  background:linear-gradient(135deg, var(--primary-light), var(--primary));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.auth-logo-sub { font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:3px; margin-top:4px; font-weight:600; }
+.auth-card {
+  width:100%; max-width:360px;
+  background:var(--bg2); border:1px solid var(--border2);
+  border-radius:28px; padding:28px 24px;
+  box-shadow:0 24px 80px rgba(0,0,0,0.5);
+}
+.auth-tab-wrap { display:flex; background:var(--bg3); border-radius:14px; padding:4px; margin-bottom:22px; }
+.auth-tab {
+  flex:1; padding:10px; border-radius:10px; border:none; background:transparent;
+  color:var(--text3); font-family:'Outfit',sans-serif; font-size:13px; font-weight:700;
+  cursor:pointer; transition:all .2s; text-transform:uppercase; letter-spacing:.8px;
+}
+.auth-tab.active { background:var(--primary); color:#0B0C10; box-shadow:0 4px 16px rgba(240,180,41,.3); }
+.inp-group { margin-bottom:14px; }
+.inp-label { font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:6px; display:block; }
+.inp {
+  width:100%; padding:14px 16px; background:var(--bg3);
+  border:1.5px solid var(--border); border-radius:var(--radius-xs);
+  color:var(--text); font-family:'Outfit',sans-serif; font-size:15px; font-weight:500;
+  outline:none; transition:all .2s; user-select:text; -webkit-user-select:text;
+}
+.inp:focus { border-color:var(--primary); background:rgba(240,180,41,0.05); }
+.inp::placeholder { color:var(--text3); }
+select.inp { cursor:pointer; }
+select.inp option { background:var(--bg3); }
+.btn-primary {
+  width:100%; padding:15px; border:none; border-radius:var(--radius-sm);
+  background:linear-gradient(135deg, var(--primary-light), var(--primary), var(--primary-dark));
+  color:#0B0C10; font-family:'Outfit',sans-serif; font-size:14px; font-weight:800;
+  cursor:pointer; letter-spacing:.8px; text-transform:uppercase;
+  box-shadow:0 6px 28px rgba(240,180,41,.3); transition:all .15s;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.btn-primary:active { transform:scale(.97); }
+.btn-outline {
+  width:100%; padding:14px; border:1.5px solid var(--border2); border-radius:var(--radius-sm);
+  background:transparent; color:var(--text2); font-family:'Outfit',sans-serif; font-size:13px; font-weight:700;
+  cursor:pointer; letter-spacing:.6px; text-transform:uppercase; transition:all .15s;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.btn-outline:active { transform:scale(.97); background:var(--bg3); }
+.btn-danger {
+  width:100%; padding:15px; border:1.5px solid rgba(239,71,111,.25); border-radius:var(--radius-sm);
+  background:var(--red-bg); color:var(--red); font-family:'Outfit',sans-serif; font-size:14px; font-weight:700;
+  cursor:pointer; letter-spacing:.6px; text-transform:uppercase; transition:all .15s;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+
+/* ── HEADER ── */
+#app-header {
+  background:rgba(11,12,16,0.96); backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border); z-index:200;
+  padding:12px 18px; flex-shrink:0;
+}
+.header-inner { display:flex; justify-content:space-between; align-items:center; }
+.header-balance-label { font-size:9px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:1.8px; margin-bottom:2px; }
+.header-balance { font-size:24px; font-weight:900; color:var(--text); letter-spacing:-0.5px; }
+.header-balance span { color:var(--primary); font-size:15px; }
+.header-right { display:flex; align-items:center; gap:10px; }
+.uid-chip {
+  background:rgba(240,180,41,0.1); border:1px solid rgba(240,180,41,0.25);
+  border-radius:10px; padding:6px 12px;
+  font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:var(--primary);
+  letter-spacing:.5px;
+}
+.notif-btn {
+  width:38px; height:38px; border-radius:10px; background:var(--bg3); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text2); font-size:15px;
+}
+
+/* ── BOTTOM NAV ── */
+#bottom-nav {
+  position:fixed; bottom:0; left:0; right:0; height:var(--nav-h);
+  background:rgba(13,14,20,0.98); border-top:1px solid var(--border);
+  backdrop-filter:blur(30px); display:flex; align-items:center; justify-content:space-around;
+  padding:0 8px 4px; z-index:500;
+}
+.nav-item {
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  padding:8px 16px; cursor:pointer; background:none; border:none;
+  color:var(--text3); transition:all .2s; flex:1;
+}
+.nav-item span { font-family:'Outfit',sans-serif; font-size:9px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; }
+.nav-item i { font-size:19px; transition:all .2s; }
+.nav-item.active { color:var(--primary); }
+.nav-item.active i { filter:drop-shadow(0 0 8px rgba(240,180,41,.5)); transform:translateY(-1px); }
+.nav-fab-wrap { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; flex:1; }
+.nav-fab {
+  width:52px; height:52px; border-radius:16px;
+  background:linear-gradient(135deg, var(--primary-light), var(--primary));
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 24px rgba(240,180,41,.4);
+  transform:translateY(-14px); border:none; cursor:pointer; transition:all .15s;
+}
+.nav-fab:active { transform:translateY(-14px) scale(.92); }
+.nav-fab i { font-size:20px; color:#0B0C10; }
+.nav-fab-label { font-family:'Outfit',sans-serif; font-size:9px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; color:var(--text3); margin-top:-10px; }
+
+/* ── HOME PAGE ── */
+/* Ticker */
+.ticker-bar {
+  background:rgba(240,180,41,0.06); border-bottom:1px solid rgba(240,180,41,0.1);
+  overflow:hidden; padding:8px 0;
+}
+.ticker-track {
+  display:flex; gap:36px; white-space:nowrap;
+  animation:tickerScroll 22s linear infinite;
+}
+@keyframes tickerScroll { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+.ticker-item {
+  display:flex; align-items:center; gap:5px;
+  font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:500; color:var(--text3);
+}
+.ticker-item.up { color:var(--green); }
+.ticker-item.down { color:var(--red); }
+
+/* Banner */
+.banner-wrap { margin:0 16px 16px; border-radius:var(--radius); overflow:hidden; position:relative; }
+.banner-img {
+  width:100%; height:160px; object-fit:cover; display:block;
+  background:linear-gradient(135deg, var(--bg3), var(--bg4));
+}
+.banner-placeholder {
+  width:100%; height:160px; background:linear-gradient(135deg, #1a1b28, #21223a);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:8px; color:var(--text3); font-size:13px; font-weight:600;
+  border:1px solid var(--border);
+}
+.banner-placeholder i { font-size:28px; color:var(--primary); opacity:0.5; }
+
+/* Balance Card */
+.balance-hero {
+  margin:0 16px 16px; border-radius:var(--radius); padding:22px;
+  background:linear-gradient(135deg, #1a1b28 0%, #15162090 50%, #12131a 100%);
+  border:1px solid rgba(240,180,41,0.15); position:relative; overflow:hidden;
+}
+.balance-hero::before {
+  content:''; position:absolute; top:-50px; right:-50px; width:180px; height:180px;
+  background:radial-gradient(circle, rgba(240,180,41,0.12) 0%, transparent 70%);
+  pointer-events:none;
+}
+.balance-hero::after {
+  content:''; position:absolute; bottom:-60px; left:-40px; width:160px; height:160px;
+  background:radial-gradient(circle, rgba(76,201,240,0.07) 0%, transparent 70%);
+  pointer-events:none;
+}
+.balance-label { font-size:9px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:2px; margin-bottom:6px; }
+.balance-value { font-size:40px; font-weight:900; letter-spacing:-1px; margin-bottom:18px; position:relative; z-index:1; }
+.balance-value span { font-size:20px; color:var(--primary); }
+.balance-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; position:relative; z-index:1; }
+.balance-stat {
+  background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.06);
+  border-radius:14px; padding:12px 14px;
+}
+.balance-stat-label { font-size:8px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:1.4px; margin-bottom:4px; }
+.balance-stat-value { font-size:17px; font-weight:800; color:var(--text); }
+.balance-stat-value.green { color:var(--green); }
+.balance-stat-value.blue { color:var(--blue); }
+
+/* Quick Pills */
+.pills-wrap { display:flex; gap:10px; padding:0 16px 18px; overflow-x:auto; }
+.pill {
+  flex-shrink:0; display:flex; align-items:center; gap:7px;
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:100px; padding:8px 14px;
+}
+.pill-icon { width:22px; height:22px; border-radius:6px; background:rgba(240,180,41,0.12); display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--primary); }
+.pill-label { font-size:10px; font-weight:600; color:var(--text3); }
+.pill-value { font-size:12px; font-weight:800; color:var(--text); }
+
+/* Section Header */
+.sec-hdr { display:flex; justify-content:space-between; align-items:center; padding:0 16px 14px; }
+.sec-hdr-title { font-size:17px; font-weight:800; }
+.sec-hdr-badge {
+  font-size:8px; font-weight:800; padding:4px 10px; border-radius:6px;
+  background:var(--green-bg); color:var(--green); text-transform:uppercase; letter-spacing:.8px;
+}
+
+/* Plan Cards Grid */
+.plans-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:0 16px 8px; }
+.plan-card {
+  border-radius:20px; padding:16px; position:relative; overflow:hidden;
+  background:var(--bg3); border:1px solid var(--border); transition:all .2s;
+  cursor:pointer;
+}
+.plan-card:active { transform:scale(.97); border-color:rgba(240,180,41,0.35); }
+.plan-card-glow {
+  position:absolute; top:-30px; right:-30px; width:100px; height:100px;
+  background:radial-gradient(circle, rgba(240,180,41,0.1) 0%, transparent 70%); pointer-events:none;
+}
+.plan-img-wrap {
+  width:100%; height:90px; border-radius:14px; overflow:hidden; margin-bottom:12px;
+  background:linear-gradient(135deg, var(--bg4), var(--bg5));
+  display:flex; align-items:center; justify-content:center;
+}
+.plan-img { width:100%; height:100%; object-fit:cover; }
+.plan-img-placeholder { font-size:28px; }
+.plan-name { font-size:13px; font-weight:800; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.plan-price { font-size:11px; font-weight:700; color:var(--primary); margin-bottom:8px; }
+.plan-stats { display:flex; flex-direction:column; gap:4px; margin-bottom:12px; }
+.plan-stat-row { display:flex; justify-content:space-between; align-items:center; }
+.plan-stat-k { font-size:9px; color:var(--text3); font-weight:600; text-transform:uppercase; letter-spacing:.6px; }
+.plan-stat-v { font-size:10px; font-weight:800; color:var(--text); }
+.plan-stat-v.gold { color:var(--primary); }
+.plan-stat-v.green { color:var(--green); }
+.plan-divider { height:1px; background:var(--border); margin-bottom:10px; }
+.plan-buy-btn {
+  width:100%; padding:10px; border:none; border-radius:10px;
+  background:linear-gradient(135deg, var(--primary-light), var(--primary));
+  color:#0B0C10; font-family:'Outfit',sans-serif; font-size:11px; font-weight:800;
+  cursor:pointer; letter-spacing:.5px; text-transform:uppercase;
+  box-shadow:0 4px 16px rgba(240,180,41,.25); transition:all .15s;
+}
+.plan-buy-btn:active { transform:scale(.96); }
+.plan-active-badge {
+  position:absolute; top:10px; right:10px; background:var(--green);
+  color:#0B0C10; font-size:7px; font-weight:800; padding:3px 7px;
+  border-radius:5px; text-transform:uppercase; letter-spacing:.6px;
+}
+
+/* ── PORTFOLIO ── */
+.portfolio-header { padding:18px 16px 14px; }
+.portfolio-header h3 { font-size:22px; font-weight:900; margin-bottom:4px; }
+.portfolio-header p { font-size:12px; color:var(--text2); }
+.portfolio-summary {
+  margin:0 16px 18px; background:var(--bg3); border:1px solid var(--border);
+  border-radius:var(--radius-sm); padding:16px 20px;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.portfolio-summary-item label { font-size:9px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:1.2px; display:block; margin-bottom:4px; }
+.portfolio-summary-item span { font-size:20px; font-weight:900; }
+.portfolio-summary-item span.gold { color:var(--primary); }
+.node-card {
+  margin:0 16px 10px; background:var(--bg3); border:1px solid var(--border);
+  border-radius:18px; padding:16px; display:flex; gap:14px; align-items:center;
+}
+.node-img-wrap {
+  width:52px; height:52px; border-radius:14px; flex-shrink:0; overflow:hidden;
+  background:linear-gradient(135deg, var(--bg4), var(--bg5));
+  display:flex; align-items:center; justify-content:center;
+}
+.node-img { width:100%; height:100%; object-fit:cover; }
+.node-icon-text { font-size:22px; }
+.node-info { flex:1; min-width:0; }
+.node-name { font-size:15px; font-weight:800; margin-bottom:3px; }
+.node-sub { display:flex; align-items:center; gap:4px; font-size:9px; font-weight:700; color:var(--green); text-transform:uppercase; letter-spacing:.6px; }
+.node-sub::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--green); animation:glow-pulse 1.5s infinite; }
+@keyframes glow-pulse { 0%,100%{opacity:1;box-shadow:0 0 4px var(--green);}50%{opacity:.4;box-shadow:none;} }
+.node-right { text-align:right; }
+.node-daily { font-size:18px; font-weight:900; color:var(--primary); }
+.node-daily-label { font-size:8px; color:var(--text3); font-weight:700; text-transform:uppercase; margin-top:2px; }
+.empty-state { text-align:center; padding:60px 20px; color:var(--text3); }
+.empty-state i { font-size:48px; display:block; margin-bottom:14px; opacity:.3; }
+.empty-state p { font-size:13px; line-height:1.7; }
+
+/* ── DEPOSIT ── */
+.page-header { padding:18px 16px 14px; }
+.page-header h3 { font-size:22px; font-weight:900; margin-bottom:4px; }
+.page-header p { font-size:12px; color:var(--text2); }
+.method-scroll { display:flex; gap:10px; padding:0 16px 16px; overflow-x:auto; }
+.method-card {
+  flex-shrink:0; width:100px; border-radius:16px; padding:14px 10px; text-align:center;
+  background:var(--bg3); border:2px solid var(--border); cursor:pointer; transition:all .2s;
+}
+.method-card.active { background:rgba(240,180,41,0.08); border-color:var(--primary); }
+.method-card-logo {
+  width:40px; height:40px; border-radius:12px; margin:0 auto 8px;
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+}
+.method-card-logo img { width:100%; height:100%; object-fit:cover; border-radius:12px; }
+.method-card-logo .method-emoji { font-size:20px; }
+.method-card-name { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.5px; color:var(--text2); }
+.method-card.active .method-card-name { color:var(--primary); }
+.method-card-min { font-size:9px; color:var(--text3); margin-top:2px; font-weight:600; }
+.deposit-form {
+  margin:0 16px 16px; background:var(--bg3); border:1px solid var(--border);
+  border-radius:var(--radius); padding:20px;
+}
+.deposit-form-title { font-size:15px; font-weight:800; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+.number-display {
+  background:rgba(240,180,41,0.07); border:1px solid rgba(240,180,41,0.2);
+  border-radius:12px; padding:14px 16px; display:flex; align-items:center; gap:10px; margin-bottom:16px;
+}
+.number-display-val {
+  flex:1; background:none; border:none; color:var(--primary);
+  font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:700;
+  outline:none; pointer-events:none; min-width:0;
+}
+.copy-btn {
+  background:var(--primary); color:#0B0C10; border:none; border-radius:8px;
+  padding:7px 14px; font-family:'Outfit',sans-serif; font-size:10px; font-weight:800;
+  cursor:pointer; text-transform:uppercase; letter-spacing:.6px; white-space:nowrap; transition:all .15s;
+}
+.copy-btn:active { transform:scale(.95); }
+.steps-box {
+  background:rgba(240,180,41,0.05); border:1px solid rgba(240,180,41,0.1);
+  border-radius:12px; padding:14px; margin:0 16px 16px;
+}
+.step { display:flex; gap:10px; align-items:flex-start; margin-bottom:10px; }
+.step:last-child { margin-bottom:0; }
+.step-num {
+  width:20px; height:20px; border-radius:6px; flex-shrink:0;
+  background:rgba(240,180,41,0.18); color:var(--primary);
+  font-size:10px; font-weight:900; display:flex; align-items:center; justify-content:center;
+}
+.step-text { font-size:11px; color:var(--text2); line-height:1.6; padding-top:2px; }
+
+/* ── PROFILE ── */
+.profile-hero {
+  margin:0 16px 16px; border-radius:var(--radius); padding:24px 20px;
+  background:linear-gradient(135deg, var(--bg3), var(--bg4));
+  border:1px solid var(--border); text-align:center; position:relative; overflow:hidden;
+}
+.profile-hero::before {
+  content:''; position:absolute; top:-60px; left:50%; transform:translateX(-50%);
+  width:200px; height:200px; border-radius:50%;
+  background:radial-gradient(circle, rgba(240,180,41,0.1) 0%, transparent 70%); pointer-events:none;
+}
+.profile-avatar {
+  width:72px; height:72px; border-radius:22px; margin:0 auto 14px;
+  background:linear-gradient(135deg, var(--primary-light), var(--primary));
+  display:flex; align-items:center; justify-content:center; font-size:28px;
+  box-shadow:0 8px 32px rgba(240,180,41,.3); position:relative; z-index:1;
+}
+.profile-name { font-size:20px; font-weight:900; margin-bottom:4px; position:relative; z-index:1; }
+.profile-phone { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--primary); font-weight:700; position:relative; z-index:1; }
+.profile-stats-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1px; background:rgba(255,255,255,0.06); border-radius:14px; overflow:hidden; margin-top:18px; position:relative; z-index:1; }
+.profile-stat { background:var(--bg4); padding:12px 8px; text-align:center; }
+.profile-stat-v { font-size:14px; font-weight:900; color:var(--primary); }
+.profile-stat-l { font-size:8px; color:var(--text3); font-weight:700; text-transform:uppercase; letter-spacing:.6px; margin-top:2px; }
+.ref-card { margin:0 16px 16px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); padding:18px; }
+.ref-card-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.ref-card-title { font-size:14px; font-weight:800; }
+.ref-badge { font-size:9px; font-weight:800; background:var(--green-bg); color:var(--green); padding:4px 10px; border-radius:6px; text-transform:uppercase; letter-spacing:.6px; }
+.ref-link-row { display:flex; gap:8px; align-items:center; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:10px; padding:10px 14px; }
+.ref-link-input { flex:1; min-width:0; background:none; border:none; color:var(--text2); font-size:11px; outline:none; pointer-events:none; font-family:'JetBrains Mono',monospace; }
+.withdraw-card { margin:0 16px 16px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); padding:18px; }
+.withdraw-card-title { font-size:16px; font-weight:800; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+.withdraw-history-title { font-size:14px; font-weight:800; padding:0 16px; margin-bottom:12px; }
+.withdraw-item {
+  margin:0 16px 10px; background:var(--bg3); border:1px solid var(--border);
+  border-radius:14px; padding:14px 16px; display:flex; justify-content:space-between; align-items:center;
+}
+.withdraw-item-name { font-size:14px; font-weight:800; margin-bottom:3px; }
+.withdraw-item-sub { font-size:10px; color:var(--text3); font-weight:600; }
+.status-badge { font-size:9px; font-weight:800; padding:5px 11px; border-radius:7px; text-transform:uppercase; letter-spacing:.6px; }
+.status-pending { background:rgba(240,180,41,0.12); color:var(--primary); }
+.status-done { background:var(--green-bg); color:var(--green); }
+.status-rejected { background:var(--red-bg); color:var(--red); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999;
+  display:flex; align-items:center; justify-content:center; padding:20px;
+  backdrop-filter:blur(8px);
+}
+.modal-box {
+  background:var(--bg2); border:1px solid var(--border2); border-radius:28px;
+  padding:28px 24px; max-width:320px; width:100%; animation:pageIn .3s ease; text-align:center;
+}
+.modal-icon {
+  width:64px; height:64px; border-radius:20px; margin:0 auto 16px;
+  background:linear-gradient(135deg, var(--primary-light), var(--primary));
+  display:flex; align-items:center; justify-content:center; font-size:24px;
+  box-shadow:0 8px 32px rgba(240,180,41,.25);
+}
+.modal-title { font-size:20px; font-weight:900; margin-bottom:8px; }
+.modal-text { font-size:13px; color:var(--text2); line-height:1.7; margin-bottom:22px; }
+
+/* ── TOAST ── */
+#toast {
+  position:fixed; top:20px; left:50%; transform:translateX(-50%) translateY(-80px);
+  background:var(--bg2); border:1px solid var(--border2); border-radius:14px;
+  padding:12px 20px; z-index:99999; font-family:'Outfit',sans-serif; font-size:13px; font-weight:700;
+  display:flex; align-items:center; gap:8px; transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  max-width:300px; width:90vw; justify-content:center;
+  box-shadow:0 8px 40px rgba(0,0,0,0.5);
+}
+#toast.show { transform:translateX(-50%) translateY(0); }
+#toast.success { border-color:rgba(6,214,160,0.35); color:var(--green); }
+#toast.error { border-color:rgba(239,71,111,0.35); color:var(--red); }
+#toast.info { border-color:rgba(240,180,41,0.35); color:var(--primary); }
+</style>
 </head>
 <body>
 
-    <div class="app-frame">
-        <div id="notice-modal" class="hidden fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-6">
-            <div class="glass p-8 rounded-[2.5rem] max-w-sm w-full text-center border-amber-500/30 animate__animated animate__zoomIn">
-                <div class="w-20 h-20 gold-gradient rounded-full flex items-center justify-center text-white text-3xl mx-auto mb-6 shadow-2xl">
-                    <i class="fas fa-bullhorn"></i>
-                </div>
-                <h3 class="text-2xl font-black mb-2 text-white">Announcement</h3>
-                <p id="notice-text" class="text-slate-400 text-sm mb-8 leading-relaxed">System Update In Progress...</p>
-                <button onclick="closeNotice()" class="w-full py-4 gold-gradient text-white font-black rounded-2xl btn-click shadow-lg">I UNDERSTAND</button>
-            </div>
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- NOTICE MODAL -->
+<div id="notice-modal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-icon">📢</div>
+    <h3 class="modal-title">Announcement</h3>
+    <p id="notice-text" class="modal-text">Welcome to GOLD-MINE PRO — Your Digital Mining Partner!</p>
+    <button onclick="closeNotice()" class="btn-primary">Got It &nbsp;<i class="fas fa-check"></i></button>
+  </div>
+</div>
+
+<!-- ══════════════ APP ══════════════ -->
+<div id="app">
+
+  <!-- ── AUTH PAGE ── -->
+  <section id="auth-page" class="page active">
+    <div class="auth-brand">
+      <div class="auth-logo">💎</div>
+      <div class="auth-logo-title">GOLD-MINE PRO</div>
+      <div class="auth-logo-sub">Digital Asset Mining Platform</div>
+    </div>
+    <div class="auth-card">
+      <div class="auth-tab-wrap">
+        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Login</button>
+        <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+      </div>
+      <div id="reg-fields" style="display:none;">
+        <div class="inp-group">
+          <label class="inp-label">Full Name</label>
+          <input id="auth-name" type="text" placeholder="Your full name" class="inp">
         </div>
+      </div>
+      <div class="inp-group">
+        <label class="inp-label">Mobile Number</label>
+        <input id="auth-mobile" type="tel" placeholder="11-digit number" class="inp">
+      </div>
+      <div class="inp-group" style="margin-bottom:20px;">
+        <label class="inp-label">4-Digit PIN</label>
+        <input id="auth-pin" type="password" placeholder="••••" maxlength="4" class="inp">
+      </div>
+      <button onclick="handleAuth()" id="auth-btn" class="btn-primary">
+        <i class="fas fa-lock-open"></i> <span id="auth-btn-text">Login Access</span>
+      </button>
+    </div>
+  </section>
 
-        <section id="auth-page" class="page active h-screen flex flex-col items-center justify-center p-8">
-            <div class="w-24 h-24 gold-gradient rounded-[2rem] flex items-center justify-center text-white text-5xl mb-8 shadow-2xl animate__animated animate__bounceIn">
-                <i class="fas fa-gem"></i>
-            </div>
-            <h1 class="text-4xl font-black mb-1">GOLD-MINE <span class="text-amber-500">BD</span></h1>
-            <p class="text-slate-500 text-xs mb-10 tracking-widest uppercase">Digital Asset Mining</p>
-            
-            <div class="w-full max-w-sm space-y-4">
-                <div id="reg-fields" class="hidden">
-                    <input id="auth-name" type="text" placeholder="Full Name" class="w-full p-5 glass rounded-2xl outline-none focus:border-amber-500 text-white transition-all">
-                </div>
-                <input id="auth-mobile" type="tel" placeholder="Mobile Number" class="w-full p-5 glass rounded-2xl outline-none focus:border-amber-500 text-white transition-all">
-                <input id="auth-pin" type="password" placeholder="4-Digit PIN" maxlength="4" class="w-full p-5 glass rounded-2xl outline-none focus:border-amber-500 text-white transition-all">
-                
-                <button onclick="handleAuth()" id="auth-btn" class="w-full gold-gradient text-white font-black py-5 rounded-2xl shadow-xl uppercase btn-click tracking-widest">Login Access</button>
-                <p id="switch-auth" class="text-center text-xs text-slate-400 mt-6 cursor-pointer" onclick="toggleAuthMode()">
-                    Don't have an account? <span class="text-amber-500 font-bold ml-1">Register Now</span>
-                </p>
-            </div>
-        </section>
+  <!-- ══════════════ MAIN APP ══════════════ -->
+  <div id="main-app" style="display:none; flex-direction:column; height:100%;">
 
-        <main id="main-app" class="hidden flex flex-col h-full">
-            <header class="glass p-6 sticky top-0 z-[100] flex justify-between items-center border-b border-white/5">
-                <div>
-                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Available Funds</p>
-                    <h2 class="text-3xl font-black text-white">৳ <span id="balance-display">0.00</span></h2>
-                </div>
-                <div class="text-right">
-                    <span id="user-id-badge" class="text-[10px] bg-amber-500/10 text-amber-500 font-black px-4 py-2 rounded-xl border border-amber-500/20">ID-XXXX</span>
-                </div>
-            </header>
-
-            <div class="scroll-area">
-                <div id="home" class="page active p-6">
-                    <div class="gold-gradient rounded-[2.5rem] p-8 mb-8 shadow-2xl relative overflow-hidden">
-                        <div class="relative z-10">
-                            <p class="text-amber-100/80 text-[10px] font-black uppercase tracking-widest mb-1">Mining Revenue</p>
-                            <h3 class="text-5xl font-black text-white mb-8">৳ <span id="profit-display">0.00</span></h3>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="bg-black/20 p-4 rounded-2xl">
-                                    <p class="text-[9px] text-amber-200 uppercase font-black">Investment</p>
-                                    <p class="font-black text-white text-lg">৳ <span id="invested-display">0.00</span></p>
-                                </div>
-                                <div class="bg-black/20 p-4 rounded-2xl text-center">
-                                    <p class="text-[9px] text-amber-200 uppercase font-black">Status</p>
-                                    <p class="font-black text-white text-[10px] mt-1 uppercase">Gold Member</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h4 class="font-black text-lg mb-6 flex items-center gap-3">
-                        <span class="w-1.5 h-6 gold-gradient rounded-full"></span>
-                        Premium Mining Nodes
-                    </h4>
-                    <div id="plans-container" class="space-y-6"></div>
-                </div>
-
-                <div id="portfolio" class="page p-6">
-                    <h3 class="text-2xl font-black mb-8">My Active Nodes</h3>
-                    <div id="portfolio-list" class="space-y-4"></div>
-                </div>
-
-                <div id="deposit" class="page p-6">
-                    <h3 class="text-2xl font-black mb-6 text-center">Recharge Wallet</h3>
-                    <div class="flex gap-3 mb-8">
-                        <button onclick="setMethod('bKash')" id="m-bkash" class="flex-1 py-4 glass rounded-2xl text-sm font-black btn-click">bKash</button>
-                        <button onclick="setMethod('Nagad')" id="m-nagad" class="flex-1 py-4 glass rounded-2xl text-sm font-black btn-click">Nagad</button>
-                    </div>
-                    <div class="glass p-8 rounded-[2.5rem] space-y-6 relative z-50">
-                        <div class="p-5 bg-white/5 rounded-2xl flex justify-between items-center border border-white/10">
-                            <input id="admin-number" value="Select Method" readonly class="bg-transparent font-black text-amber-500 outline-none text-lg w-full">
-                            <button onclick="copyNumber()" class="gold-gradient text-white px-5 py-2.5 rounded-xl text-[10px] font-black btn-click">COPY</button>
-                        </div>
-                        
-                        <div class="space-y-2">
-                            <p class="text-[10px] font-black text-slate-400 uppercase ml-2">Recharge Amount</p>
-                            <input id="dep-amt" type="number" placeholder="Min 200" class="w-full p-5 glass rounded-2xl outline-none text-white font-bold border border-white/5 focus:border-amber-500">
-                        </div>
-                        
-                        <div class="space-y-2">
-                            <p class="text-[10px] font-black text-slate-400 uppercase ml-2">Transaction ID</p>
-                            <input id="dep-tx" type="text" placeholder="TrxID" class="w-full p-5 glass rounded-2xl outline-none text-white font-bold uppercase border border-white/5 focus:border-amber-500">
-                        </div>
-
-                        <button onclick="requestDeposit()" class="w-full py-5 gold-gradient text-white font-black rounded-2xl shadow-xl btn-click uppercase tracking-widest">Verify Payment</button>
-                    </div>
-                </div>
-
-                <div id="profile" class="page p-6">
-                    <div class="glass p-8 rounded-[2.5rem] text-center mb-8 shadow-xl">
-                        <div class="w-20 h-20 gold-gradient rounded-full mx-auto mb-4 flex items-center justify-center text-3xl shadow-2xl">
-                            <i class="fas fa-user-astronaut"></i>
-                        </div>
-                        <h2 id="u-name" class="text-2xl font-black text-white">Miner</h2>
-                        <p id="u-phone" class="text-xs text-amber-500 font-bold tracking-widest mt-1 uppercase">Verified Account</p>
-                    </div>
-
-                    <div class="glass p-6 rounded-[2rem] mb-8 border border-amber-500/20">
-                        <div class="flex items-center justify-between mb-4">
-                            <h4 class="text-xs font-black uppercase text-slate-400 tracking-widest">Referral Link</h4>
-                            <span class="text-[9px] bg-green-500/20 text-green-500 px-2 py-1 rounded-md font-black">BONUS 10%</span>
-                        </div>
-                        <div class="flex gap-2">
-                            <input id="ref-link-input" readonly class="bg-white/5 p-3 rounded-xl text-[10px] flex-1 outline-none text-slate-400 border border-white/5">
-                            <button onclick="copyReferral()" class="gold-gradient text-white px-5 rounded-xl text-[10px] font-black btn-click">COPY</button>
-                        </div>
-                    </div>
-
-                    <div class="glass p-8 rounded-[2.5rem] space-y-6">
-                        <h4 class="font-black text-lg">Withdrawal Area</h4>
-                        <input id="w-amt" type="number" placeholder="Amount (Min 600)" class="w-full p-5 glass rounded-2xl outline-none border border-white/5 focus:border-amber-500">
-                        <input id="w-num" type="tel" placeholder="Receiver Number" class="w-full p-5 glass rounded-2xl outline-none border border-white/5 focus:border-amber-500">
-                        <button onclick="requestWithdraw()" class="w-full py-5 bg-white text-slate-900 font-black rounded-2xl btn-click uppercase tracking-widest">Cash Out</button>
-                    </div>
-                    
-                    <div id="withdraw-status-list" class="mt-8 space-y-3"></div>
-                    <button onclick="logout()" class="w-full py-5 text-rose-500 font-black glass rounded-2xl mt-12 border-rose-500/10 btn-click uppercase">Logout</button>
-                </div>
-            </div>
-
-            <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/5 flex justify-around p-6 z-[1000] rounded-t-[2.5rem] shadow-2xl">
-                <button onclick="navigate('home')" class="nav-btn p-2 nav-active" data-page="home"><i class="fas fa-th-large text-xl"></i></button>
-                <button onclick="navigate('portfolio')" class="nav-btn p-2 text-slate-500" data-page="portfolio"><i class="fas fa-microchip text-xl"></i></button>
-                <button onclick="navigate('deposit')" class="nav-btn p-2 text-slate-500" data-page="deposit"><i class="fas fa-plus-circle text-2xl gold-gradient text-white rounded-full w-12 h-12 flex items-center justify-center -translate-y-5 shadow-xl shadow-amber-500/20"></i></button>
-                <button onclick="navigate('profile')" class="nav-btn p-2 text-slate-500" data-page="profile"><i class="fas fa-user-circle text-xl"></i></button>
-            </nav>
-        </main>
+    <!-- Header -->
+    <div id="app-header">
+      <div class="header-inner">
+        <div>
+          <div class="header-balance-label">Available Balance</div>
+          <div class="header-balance"><span>$</span><span id="balance-display">0.00</span></div>
+        </div>
+        <div class="header-right">
+          <div class="uid-chip" id="user-id-badge">GM-XXXX</div>
+        </div>
+      </div>
     </div>
 
-    <script>
-        // আপনার Firebase Config এখানে বসান
-        const firebaseConfig = { 
-            apiKey: "AIzaSyDXD_ANF89k7StmGJ1Xz55nGUOB3ajMoF4", 
-            authDomain: "smartinvestpro-c659f.firebaseapp.com", 
-            databaseURL: "https://smartinvestpro-c659f-default-rtdb.firebaseio.com", 
-            projectId: "smartinvestpro-c659f", 
-            storageBucket: "smartinvestpro-c659f.firebasestorage.app", 
-            messagingSenderId: "294616388438", 
-            appId: "1:294616388438:web:54250014b8625fb50c3cf7" 
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+    <!-- Scroll Area -->
+    <div class="scroll-area">
 
-        let state = null;
-        let isLoginMode = true;
-        let currentMethod = null;
-
-        function closeNotice() { document.getElementById('notice-modal').style.display = 'none'; }
-        
-        function toggleAuthMode() { 
-            isLoginMode = !isLoginMode; 
-            document.getElementById('reg-fields').classList.toggle('hidden');
-            document.getElementById('auth-btn').innerText = isLoginMode ? "Login Access" : "Join Now";
-        }
-
-        window.onload = async () => {
-            const savedPhone = localStorage.getItem('logged_phone');
-            if(savedPhone) {
-                const snap = await db.ref('users/' + savedPhone).once('value');
-                if(snap.exists()){ state = snap.val(); loginSuccess(); }
-            }
-        };
-
-        async function handleAuth() {
-            const mobile = document.getElementById('auth-mobile').value.trim();
-            const pin = document.getElementById('auth-pin').value.trim();
-            if(mobile.length !== 11 || pin.length < 4) return alert("Enter valid details!");
-
-            if(!isLoginMode) {
-                const name = document.getElementById('auth-name').value.trim();
-                const check = await db.ref('users/' + mobile).once('value');
-                if(check.exists()) return alert("Mobile already registered!");
-                state = { 
-                    name, phone: mobile, pin, 
-                    userId: 'GM-'+Math.floor(1000+Math.random()*8999), 
-                    balance: 0, invested: 0, profit: 0, 
-                    myPlans: [], withdraws: [], lastClaim: Date.now() 
-                };
-                await db.ref('users/' + mobile).set(state);
-            } else {
-                const snap = await db.ref('users/' + mobile).once('value');
-                if(!snap.exists() || snap.val().pin !== pin) return alert("Invalid Credentials");
-                state = snap.val();
-            }
-            localStorage.setItem('logged_phone', mobile);
-            loginSuccess();
-        }
-
-        function loginSuccess() {
-            document.getElementById('auth-page').style.display = 'none';
-            document.getElementById('main-app').classList.remove('hidden');
-            db.ref('users/' + state.phone).on('value', snap => { 
-                if(snap.exists()) { state = snap.val(); refreshUI(); checkAutoProfit(); }
-            });
-            db.ref('appSettings').on('value', s => {
-                const d = s.val() || {};
-                document.getElementById('notice-text').innerText = d.notice || "Welcome to GOLD-MINE PRO!";
-                document.getElementById('notice-modal').style.display = 'flex';
-            });
-            const baseUrl = window.location.origin + window.location.pathname;
-            document.getElementById('ref-link-input').value = baseUrl + "?ref=" + state.phone;
-            navigate('home');
-        }
-
-        async function checkAutoProfit() {
-            if (!state.myPlans) return;
-            const now = Date.now();
-            const daysPassed = Math.floor((now - (state.lastClaim || now)) / (24*60*60*1000));
-            if (daysPassed >= 1) {
-                let daily = 0; state.myPlans.forEach(p => daily += parseFloat(p.daily));
-                const total = daily * daysPassed;
-                await db.ref('users/' + state.phone).update({ 
-                    balance: (state.balance || 0) + total, 
-                    profit: (state.profit || 0) + total, 
-                    lastClaim: now 
-                });
-            }
-        }
-
-        function refreshUI() {
-            document.getElementById('balance-display').innerText = (state.balance || 0).toFixed(2);
-            document.getElementById('profit-display').innerText = (state.profit || 0).toFixed(2);
-            document.getElementById('invested-display').innerText = (state.invested || 0).toFixed(2);
-            document.getElementById('user-id-badge').innerText = state.userId;
-            document.getElementById('u-name').innerText = state.name;
-            renderPortfolio(); renderWithdrawStatus();
-        }
-
-        function renderPlans() {
-            db.ref('appPlans').once('value', snap => {
-                let h = '';
-                snap.forEach(c => {
-                    const p = c.val();
-                    h += `
-                    <div class="plan-card mb-6">
-                        <div class="flex justify-between items-center mb-5">
-                            <div class="flex items-center gap-4">
-                                <div class="w-14 h-14 gold-gradient rounded-2xl flex items-center justify-center text-2xl shadow-lg">${p.icon || '💎'}</div>
-                                <div><h4 class="font-black text-white text-lg">${p.title}</h4><p class="text-[8px] text-green-500 uppercase tracking-widest animate-pulse">Online Node</p></div>
-                            </div>
-                            <div class="text-right"><p class="text-[8px] text-slate-500 uppercase">Daily</p><p class="text-xl font-black text-amber-500">৳${p.daily}</p></div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-2 mb-6">
-                            <div class="bg-white/5 p-3 rounded-xl text-center"><p class="text-[7px] text-slate-500 uppercase">Days</p><p class="text-xs font-black text-white">${p.days}</p></div>
-                            <div class="bg-white/5 p-3 rounded-xl text-center"><p class="text-[7px] text-slate-500 uppercase">Total</p><p class="text-xs font-black text-white">৳${p.daily * p.days}</p></div>
-                            <div class="bg-white/5 p-3 rounded-xl text-center"><p class="text-[7px] text-slate-500 uppercase">Tax</p><p class="text-xs font-black text-white">0%</p></div>
-                        </div>
-                        <button onclick="buyPlan('${c.key}')" class="w-full gold-gradient text-white py-4 rounded-2xl text-[10px] font-black uppercase btn-click shadow-xl">Activate @ ৳${p.price}</button>
-                    </div>`;
-                });
-                document.getElementById('plans-container').innerHTML = h || "<p class='text-center opacity-20 py-10'>No Plans Available</p>";
-            });
-        }
-
-        async function buyPlan(k) {
-            const p = (await db.ref('appPlans/' + k).once('value')).val();
-            if(state.balance >= p.price) {
-                const plans = state.myPlans || [];
-                plans.push({ title: p.title, daily: p.daily, icon: p.icon || '💎' });
-                await db.ref('users/' + state.phone).update({ balance: state.balance - p.price, invested: (state.invested || 0) + p.price, myPlans: plans, lastClaim: Date.now() });
-                alert("Activated!"); navigate('portfolio');
-            } else { alert("Low Balance!"); navigate('deposit'); }
-        }
-
-        function renderPortfolio() {
-            const list = state.myPlans || [];
-            document.getElementById('portfolio-list').innerHTML = list.map(i => `
-                <div class="glass p-5 rounded-[2rem] flex justify-between items-center border-white/5">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 gold-gradient rounded-2xl flex items-center justify-center text-xl shadow-lg">${i.icon}</div>
-                        <div><h4 class="font-black text-xs text-white">${i.title}</h4><p class="text-[8px] text-green-400 uppercase font-black animate-pulse">Mining...</p></div>
-                    </div>
-                    <div class="text-right"><p class="text-xs font-black text-white">৳${i.daily}/Day</p></div>
-                </div>`).reverse().join('');
-        }
-
-        function navigate(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.replace('nav-active', 'text-slate-500'));
-            const btn = document.querySelector(`[data-page="${id}"]`);
-            if(btn) btn.classList.replace('text-slate-500', 'nav-active');
-            if(id === 'home') renderPlans();
-        }
-
-        function setMethod(m) {
-            currentMethod = m;
-            document.querySelectorAll('#deposit button[id^="m-"]').forEach(b => b.className = 'flex-1 py-4 glass rounded-2xl text-sm font-black btn-click');
-            document.getElementById('m-'+m.toLowerCase()).classList.add('gold-gradient', 'text-white');
-            db.ref('appSettings').once('value', s => { 
-                document.getElementById('admin-number').value = s.val()[m.toLowerCase()] || 'No Number'; 
-            });
-        }
-
-        function copyNumber() { navigator.clipboard.writeText(document.getElementById('admin-number').value); alert("Copied!"); }
-        function copyReferral() { navigator.clipboard.writeText(document.getElementById('ref-link-input').value); alert("Link Copied!"); }
-
-        async function requestDeposit() {
-            const amt = parseFloat(document.getElementById('dep-amt').value);
-            const tx = document.getElementById('dep-tx').value.trim();
-            if(!currentMethod || isNaN(amt) || tx.length < 5) return alert("Complete the form!");
-            await db.ref('requests/deposits').push({ phone: state.phone, name: state.name, amount: amt, tx, method: currentMethod, status: 'Pending', date: new Date().toLocaleString() });
-            alert("Submitted!"); navigate('home');
-        }
-
-        async function requestWithdraw() {
-            const amt = parseFloat(document.getElementById('w-amt').value);
-            const num = document.getElementById('w-num').value.trim();
-            if(isNaN(amt) || amt < 600 || amt > state.balance || num.length !== 11) return alert("Invalid data!");
-            const ws = state.withdraws || [];
-            const r = { amount: amt, status: 'Pending', date: new Date().toLocaleDateString() };
-            ws.push(r);
-            await db.ref('requests/withdraws').push({ ...r, phone: state.phone });
-            await db.ref('users/' + state.phone).update({ balance: state.balance - amt, withdraws: ws });
-            alert("Requested!");
-        }
-
-        function renderWithdrawStatus() {
-            const list = state.withdraws || [];
-            document.getElementById('withdraw-status-list').innerHTML = list.map(w => `<div class="glass p-5 rounded-2xl flex justify-between items-center"><div><p class="text-xs font-black text-white">৳${w.amount}</p><p class="text-[8px] text-slate-500 mt-0.5">${w.date}</p></div><span class="text-[9px] font-black uppercase px-3 py-1 rounded-full ${w.status === 'Pending' ? 'bg-amber-500/10 text-amber-500' : 'bg-green-500/10 text-green-500'}">${w.status}</span></div>`).reverse().join('');
-        }
-
-        function logout() { localStorage.clear(); location.reload(); }
-    </script>
-</body>
-</html>                <button onclick="requestWithdraw()" class="w-full py-4 bg-white text-slate-900 font-black rounded-2xl">Cash Out</button>
-            </div>
-            <div id="withdraw-status-list" class="space-y-3 mt-6"></div>
-            <button onclick="logout()" class="w-full py-4 text-rose-200 font-bold glass rounded-2xl mt-10">Logout</button>
+      <!-- ── HOME ── -->
+      <div id="home" class="page active">
+        <!-- Ticker -->
+        <div class="ticker-bar">
+          <div class="ticker-track">
+            <span class="ticker-item up"><i class="fas fa-arrow-up" style="font-size:8px;"></i> BTC $67,420</span>
+            <span class="ticker-item up"><i class="fas fa-arrow-up" style="font-size:8px;"></i> ETH $3,520</span>
+            <span class="ticker-item down"><i class="fas fa-arrow-down" style="font-size:8px;"></i> BNB $412</span>
+            <span class="ticker-item up"><i class="fas fa-arrow-up" style="font-size:8px;"></i> SOL $178</span>
+            <span class="ticker-item up"><i class="fas fa-arrow-up" style="font-size:8px;"></i> GOLD $2,380</span>
+            <span class="ticker-item down"><i class="fas fa-arrow-down" style="font-size:8px;"></i> XRP $0.58</span>
+            <span class="ticker-item up"><i class="fas fa-arrow-up" style="font-size:8px;"></i> BTC $67,420</span>
+            <span class="ticker-item up"><i class="fas fa-arrow-up" style="font-size:8px;"></i> ETH $3,520</span>
+            <span class="ticker-item down"><i class="fas fa-arrow-down" style="font-size:8px;"></i> BNB $412</span>
+            <span class="ticker-item up"><i class="fas fa-arrow-up" style="font-size:8px;"></i> SOL $178</span>
+            <span class="ticker-item up"><i class="fas fa-arrow-up" style="font-size:8px;"></i> GOLD $2,380</span>
+            <span class="ticker-item down"><i class="fas fa-arrow-down" style="font-size:8px;"></i> XRP $0.58</span>
+          </div>
         </div>
 
-        <nav class="fixed bottom-0 left-0 right-0 glass border-t border-slate-800 flex justify-around p-4 z-50 rounded-t-3xl">
-            <button onclick="navigate('home')" class="nav-btn p-3 nav-active" data-page="home"><i class="fas fa-home text-xl"></i></button>
-            <button onclick="navigate('portfolio')" class="nav-btn p-3 text-slate-200" data-page="portfolio"><i class="fas fa-chart-pie text-xl"></i></button>
-            <button onclick="navigate('deposit')" class="nav-btn p-3 text-slate-200" data-page="deposit"><i class="fas fa-wallet text-xl"></i></button>
-            <button onclick="navigate('profile')" class="nav-btn p-3 text-slate-200" data-page="profile"><i class="fas fa-user-circle text-xl"></i></button>
-        </nav>
-    </main>
-
-    <script>
-        const firebaseConfig = { apiKey: "AIzaSyDXD_ANF89k7StmGJ1Xz55nGUOB3ajMoF4", authDomain: "smartinvestpro-c659f.firebaseapp.com", databaseURL: "https://smartinvestpro-c659f-default-rtdb.firebaseio.com", projectId: "smartinvestpro-c659f", storageBucket: "smartinvestpro-c659f.firebasestorage.app", messagingSenderId: "294616388438", appId: "1:294616388438:web:54250014b8625fb50c3cf7" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        let state = null;
-        let isLoginMode = true;
-
-        function closeNotice() { document.getElementById('notice-modal').style.display = 'none'; }
-        
-        function toggleAuthMode() { 
-            isLoginMode = !isLoginMode; 
-            document.getElementById('reg-fields').classList.toggle('hidden');
-            document.getElementById('auth-btn').innerText = isLoginMode ? "Login" : "Register";
-            document.getElementById('switch-auth').innerHTML = isLoginMode ? "New here? <span class='text-amber-500 font-bold'>Register Now</span>" : "Have account? <span class='text-amber-500 font-bold'>Login</span>";
-        }
-
-        window.onload = async () => {
-            const savedPhone = localStorage.getItem('logged_phone');
-            if(savedPhone) {
-                const snap = await db.ref('users/' + savedPhone).once('value');
-                if(snap.exists()){ state = snap.val(); loginSuccess(); }
-            }
-        };
-
-        async function handleAuth() {
-            const mobile = document.getElementById('auth-mobile').value;
-            const pin = document.getElementById('auth-pin').value;
-            if(!isLoginMode) {
-                const name = document.getElementById('auth-name').value;
-                if(!name || mobile.length < 10) return alert("Valid Details Required");
-                state = { name, phone: mobile, pin, userId: 'ID-'+Math.floor(1000+Math.random()*9000), balance: 0, invested: 0, profit: 0, myPlans: [], lastClaim: Date.now() };
-                await db.ref('users/' + mobile).set(state);
-            } else {
-                const snap = await db.ref('users/' + mobile).once('value');
-                if(!snap.exists() || snap.val().pin !== pin) return alert("Wrong Credentials");
-                state = snap.val();
-            }
-            localStorage.setItem('logged_phone', mobile);
-            loginSuccess();
-        }
-
-        function loginSuccess() {
-            document.getElementById('auth-page').style.display = 'none';
-            document.getElementById('main-app').classList.remove('hidden');
-            
-            db.ref('users/' + state.phone).on('value', snap => { 
-                state = snap.val(); 
-                refreshUI(); 
-                checkAutoProfit(); 
-            });
-
-            // Admin Logic: Notice, Plans, Links
-            db.ref('appSettings').on('value', s => {
-                const data = s.val() || {};
-                document.getElementById('notice-text').innerText = data.notice || "Welcome!";
-                document.getElementById('notice-modal').style.display = 'flex';
-                document.getElementById('tg-link').href = data.telegram || "#";
-                document.getElementById('wa-link').href = "https://wa.me/" + (data.whatsapp || "");
-            });
-
-            navigate('home');
-        }
-
-        async function checkAutoProfit() {
-            if (!state.myPlans || state.myPlans.length === 0) return;
-            const now = Date.now();
-            const lastClaim = state.lastClaim || 0;
-            const oneDay = 24 * 60 * 60 * 1000;
-
-            if (now - lastClaim >= oneDay) {
-                let dailyTotal = 0;
-                state.myPlans.forEach(p => dailyTotal += p.daily);
-                if (dailyTotal > 0) {
-                    await db.ref('users/' + state.phone).update({
-                        balance: (state.balance || 0) + dailyTotal,
-                        profit: (state.profit || 0) + dailyTotal,
-                        lastClaim: now
-                    });
-                }
-            }
-        }
-
-        function refreshUI() {
-            document.getElementById('balance-display').innerText = (state.balance || 0).toFixed(2);
-            document.getElementById('profit-display').innerText = (state.profit || 0).toFixed(2);
-            document.getElementById('invested-display').innerText = (state.invested || 0).toFixed(2);
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>​🪙 GOLD-MINE BD 🪙 </title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;900&display=swap');
-        body { font-family: 'Outfit', sans-serif; background: #020617; color: #f8fafc; overflow-x: hidden; }
-        
-        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); }
-        .gold-gradient { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); position: relative; overflow: hidden; }
-        
-        /* Premium Button Shine Effect */
-        .gold-gradient::after {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: rgba(255,255,255,0.2); transform: rotate(45deg); transition: 0.6s;
-        }
-        .gold-gradient:hover::after { left: 120%; }
-
-        .nav-active { color: #fbbf24; transform: translateY(-5px); text-shadow: 0 0 15px rgba(251, 191, 36, 0.5); }
-        .page { display: none; }
-        .page.active { display: block; animation: slideUp 0.4s ease-out; }
-        
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .card-glow { box-shadow: 0 0 20px rgba(251, 191, 36, 0.05); border: 1px solid rgba(251, 191, 36, 0.1); }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        
-        #notice-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
-    </style>
-</head>
-<body class="no-scrollbar">
-
-    <div id="notice-modal" class="flex">
-        <div class="glass p-8 rounded-[2.5rem] max-w-sm w-full text-center border-amber-500/30 animate__animated animate__zoomIn">
-            <div class="w-20 h-20 gold-gradient rounded-full flex items-center justify-center text-white text-3xl mx-auto mb-6 shadow-2xl">
-                <i class="fas fa-bullhorn"></i>
-            </div>
-            <h3 class="text-2xl font-black mb-3 text-white">Announcement</h3>
-            <p id="notice-text" class="text-slate-400 text-sm leading-relaxed mb-8">Loading updates...</p>
-            <button onclick="closeNotice()" class="w-full py-4 gold-gradient text-white font-black rounded-2xl shadow-xl uppercase tracking-widest">Understand</button>
-        </div>
-    </div>
-
-    <div id="live-toast" class="fixed bottom-24 left-4 z-[1000] hidden animate__animated animate__fadeInUp">
-        <div class="glass p-3 rounded-2xl flex items-center gap-3 shadow-2xl border-amber-500/20">
-            <div class="w-10 h-10 gold-gradient rounded-full flex items-center justify-center text-white shadow-lg"><i class="fas fa-bolt text-xs"></i></div>
-            <div>
-                <p id="toast-text" class="text-[11px] font-bold text-white"></p>
-                <p class="text-[9px] text-green-500 font-black uppercase">Transaction Verified</p>
-            </div>
-        </div>
-    </div>
-
-    <section id="auth-page" class="page active min-h-screen flex flex-col items-center justify-center p-8">
-        <div class="w-24 h-24 gold-gradient rounded-[2rem] flex items-center justify-center text-white text-5xl mb-8 shadow-2xl animate__animated animate__bounceIn">
-            <i class="fas fa-gem"></i>
-        </div>
-        <h1 class="text-4xl font-black mb-2 tracking-tight">GOLD-MINE <span class="text-amber-500">BD</span></h1>
-        <p class="text-slate-500 text-sm mb-12 font-medium">Digital Mining Revolution</p>
-        
-        <div class="w-full max-w-sm space-y-4">
-            <div id="reg-fields" class="hidden">
-                <input id="auth-name" type="text" placeholder="Full Name" class="w-full p-4 glass rounded-2xl outline-none border-transparent focus:border-amber-500 text-white transition-all">
-            </div>
-            <input id="auth-mobile" type="tel" placeholder="Mobile Number" class="w-full p-4 glass rounded-2xl outline-none border-transparent focus:border-amber-500 text-white transition-all">
-            <input id="auth-pin" type="password" placeholder="4-Digit PIN" maxlength="4" class="w-full p-4 glass rounded-2xl outline-none border-transparent focus:border-amber-500 text-white transition-all">
-            
-            <button onclick="handleAuth()" id="auth-btn" class="w-full gold-gradient text-white font-black py-5 rounded-2xl shadow-lg uppercase tracking-widest mt-4">Login Account</button>
-            
-            <p id="switch-auth" class="text-center text-xs text-slate-400 mt-8 cursor-pointer" onclick="toggleAuthMode()">
-                Don't have an account? <span class="text-amber-500 font-bold ml-1">Register Now</span>
-            </p>
-        </div>
-    </section>
-
-    <main id="main-app" class="hidden min-h-screen pb-32">
-        <header class="glass p-6 sticky top-0 z-50 flex justify-between items-center border-b border-white/5">
-            <div>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Available Balance</p>
-                <h2 class="text-3xl font-black text-white">৳ <span id="balance-display">0.00</span></h2>
-            </div>
-            <div class="flex flex-col items-end">
-                <span id="user-id-badge" class="text-[10px] bg-amber-500/10 text-amber-500 font-black px-4 py-1.5 rounded-full border border-amber-500/20 shadow-inner">ID-XXXX</span>
-            </div>
-        </header>
-
-        <div id="home" class="page p-6">
-            <div class="gold-gradient rounded-[2.5rem] p-8 mb-10 shadow-2xl shadow-amber-900/20 relative overflow-hidden">
-                <div class="relative z-10">
-                    <p class="text-amber-100/80 text-xs font-bold uppercase tracking-widest mb-2">Total Accumulated Profit</p>
-                    <h3 class="text-5xl font-black text-white mb-8">৳ <span id="profit-display">0.00</span></h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-black/20 backdrop-blur-md p-4 rounded-2xl">
-                            <p class="text-[9px] text-amber-200 font-bold uppercase mb-1">Total Assets</p>
-                            <p class="font-black text-white text-lg">৳ <span id="invested-display">0.00</span></p>
-                        </div>
-                        <div class="bg-black/20 backdrop-blur-md p-4 rounded-2xl">
-                            <p class="text-[9px] text-amber-200 font-bold uppercase mb-1">Platform Rank</p>
-                            <p class="font-black text-white text-[10px] mt-1 tracking-tighter">GOLD PRO MEMBER</p>
-                        </div>
-                    </div>
-                </div>
-                <i class="fas fa-chart-line absolute -bottom-4 -right-4 text-white/10 text-9xl"></i>
-            </div>
-
-            <h4 class="font-black text-xl mb-6 flex items-center gap-3">
-                <span class="w-2 h-8 gold-gradient rounded-full"></span>
-                Premium Mining Plans
-            </h4>
-            <div id="plans-container" class="space-y-6"></div>
+        <!-- Banner -->
+        <div class="banner-wrap" id="banner-wrap">
+          <div class="banner-placeholder" id="banner-placeholder">
+            <i class="fas fa-image"></i>
+            <span>Banner Image</span>
+          </div>
+          <img id="banner-img" class="banner-img" src="" alt="Banner" style="display:none;" onerror="this.style.display='none'; document.getElementById('banner-placeholder').style.display='flex';">
         </div>
 
-        <div id="portfolio" class="page p-6">
-            <h3 class="text-2xl font-black mb-8">My Active Nodes</h3>
-            <div id="portfolio-list" class="space-y-4"></div>
+        <!-- Balance Hero -->
+        <div class="balance-hero">
+          <div class="balance-label">Total Mining Revenue</div>
+          <div class="balance-value"><span>$</span><span id="profit-display">0.00</span></div>
+          <div class="balance-grid">
+            <div class="balance-stat">
+              <div class="balance-stat-label">Invested</div>
+              <div class="balance-stat-value blue">$<span id="invested-display">0.00</span></div>
+            </div>
+            <div class="balance-stat">
+              <div class="balance-stat-label">Membership</div>
+              <div class="balance-stat-value" style="font-size:13px;">🟡 Gold</div>
+            </div>
+          </div>
         </div>
 
-        <div id="deposit" class="page p-6">
-            <h3 class="text-2xl font-black mb-6">Wallet Recharge</h3>
-            <div class="flex gap-3 mb-6">
-                <button onclick="setMethod('bKash')" id="m-bkash" class="flex-1 py-4 glass rounded-2xl text-sm font-black border border-white/5 transition-all">bKash</button>
-                <button onclick="setMethod('Nagad')" id="m-nagad" class="flex-1 py-4 glass rounded-2xl text-sm font-black border border-white/5 transition-all">Nagad</button>
-            </div>
-            
-            <div class="glass p-8 rounded-[2.5rem] space-y-6 card-glow">
-                <div class="p-5 bg-white/5 rounded-2xl flex justify-between items-center border border-white/10">
-                    <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Official Receiver</p>
-                        <input id="admin-number" value="Select Method" readonly class="bg-transparent font-black text-amber-500 outline-none text-lg w-full">
-                    </div>
-                    <button onclick="copyNumber()" class="gold-gradient text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-lg">COPY</button>
-                </div>
-                
-                <div class="space-y-4">
-                    <input id="dep-amt" type="number" placeholder="Enter Amount (Min 200)" class="w-full p-5 glass rounded-2xl outline-none font-bold border-transparent focus:border-amber-500 transition-all">
-                    <input id="dep-tx" type="text" placeholder="Enter Transaction ID" class="w-full p-5 glass rounded-2xl outline-none font-bold border-transparent focus:border-amber-500 transition-all uppercase">
-                </div>
-                
-                <button onclick="requestDeposit()" class="w-full py-5 gold-gradient text-white font-black rounded-2xl shadow-xl uppercase tracking-widest">Submit Deposit</button>
-            </div>
+        <!-- Pills -->
+        <div class="pills-wrap">
+          <div class="pill">
+            <div class="pill-icon"><i class="fas fa-server"></i></div>
+            <div><div class="pill-label">Nodes</div><div class="pill-value" id="stat-nodes">0</div></div>
+          </div>
+          <div class="pill">
+            <div class="pill-icon"><i class="fas fa-chart-line"></i></div>
+            <div><div class="pill-label">ROI</div><div class="pill-value" id="stat-roi">0%</div></div>
+          </div>
+          <div class="pill">
+            <div class="pill-icon"><i class="fas fa-wallet"></i></div>
+            <div><div class="pill-label">Withdrawals</div><div class="pill-value" id="stat-withdraws">0</div></div>
+          </div>
+          <div class="pill">
+            <div class="pill-icon"><i class="fas fa-clock"></i></div>
+            <div><div class="pill-label">Last Claim</div><div class="pill-value" id="stat-last">—</div></div>
+          </div>
         </div>
 
-        <div id="profile" class="page p-6">
-            <div class="glass p-8 rounded-[2.5rem] text-center mb-8 card-glow">
-                <div class="w-20 h-20 gold-gradient rounded-full mx-auto mb-4 flex items-center justify-center text-3xl shadow-2xl">
-                    <i class="fas fa-user-tie"></i>
-                </div>
-                <h2 id="u-name" class="text-2xl font-black text-white">Loading...</h2>
-                <p id="u-phone" class="text-xs text-amber-500 font-bold tracking-widest mt-1">VERIFIED MEMBER</p>
-            </div>
+        <!-- Plans -->
+        <div class="sec-hdr">
+          <h4 class="sec-hdr-title">Mining Nodes</h4>
+          <span class="sec-hdr-badge">Live</span>
+        </div>
+        <div class="plans-grid" id="plans-grid"></div>
+        <div id="plans-empty" style="display:none;" class="empty-state">
+          <i class="fas fa-server"></i>
+          <p>No plans available yet.<br>Check back soon!</p>
+        </div>
+        <div style="height:10px;"></div>
+      </div>
 
-            <div class="glass p-6 rounded-[2rem] mb-8 border-dashed border-amber-500/30">
-                <p class="text-[10px] font-black text-slate-400 uppercase mb-3">Your Referral Link</p>
-                <div class="flex gap-2">
-                    <input id="ref-link" readonly class="bg-white/5 p-3 rounded-xl text-[10px] flex-1 outline-none text-slate-300">
-                    <button onclick="copyReferral()" class="bg-amber-500/20 text-amber-500 px-4 rounded-xl text-[10px] font-black">COPY</button>
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-4 mb-8">
-                <a href="#" id="tg-link" target="_blank" class="glass p-5 rounded-3xl flex flex-col items-center gap-3 hover:bg-white/5 transition-all">
-                    <i class="fab fa-telegram text-3xl text-blue-400"></i>
-                    <span class="text-[10px] font-black uppercase tracking-tighter">Community</span>
-                </a>
-                <a href="#" id="wa-link" target="_blank" class="glass p-5 rounded-3xl flex flex-col items-center gap-3 hover:bg-white/5 transition-all">
-                    <i class="fab fa-whatsapp text-3xl text-green-400"></i>
-                    <span class="text-[10px] font-black uppercase tracking-tighter">Live Support</span>
-                </a>
-            </div>
+      <!-- ── PORTFOLIO ── -->
+      <div id="portfolio" class="page">
+        <div class="portfolio-header">
+          <h3>My Active Nodes</h3>
+          <p>All mining operations running 24/7</p>
+        </div>
+        <div class="portfolio-summary">
+          <div class="portfolio-summary-item">
+            <label>Daily Earning</label>
+            <span class="gold">$<span id="portfolio-daily">0.00</span></span>
+          </div>
+          <div class="portfolio-summary-item" style="text-align:right;">
+            <label>Total Nodes</label>
+            <span>×<span id="portfolio-count">0</span></span>
+          </div>
+        </div>
+        <div id="portfolio-list"></div>
+      </div>
 
-            <div class="glass p-8 rounded-[2.5rem] space-y-6">
-                <h4 class="font-black text-lg flex items-center gap-2"><i class="fas fa-hand-holding-usd text-amber-500"></i> Withdrawal</h4>
-                <div class="space-y-4">
-                    <input id="w-amt" type="number" placeholder="Amount (Min 600)" class="w-full p-5 glass rounded-2xl outline-none border-transparent focus:border-amber-500">
-                    <input id="w-num" type="tel" placeholder="Receiver Number" class="w-full p-5 glass rounded-2xl outline-none border-transparent focus:border-amber-500">
-                </div>
-                <button onclick="requestWithdraw()" class="w-full py-5 bg-white text-slate-900 font-black rounded-2xl uppercase tracking-widest shadow-xl">Process Cashout</button>
-            </div>
+      <!-- ── DEPOSIT ── -->
+      <div id="deposit" class="page">
+        <div class="page-header">
+          <h3>Recharge Wallet</h3>
+          <p>Select payment method & send funds</p>
+        </div>
+        <div class="method-scroll" id="method-scroll">
+          <div style="color:var(--text3);font-size:12px;padding:10px;">Loading methods...</div>
+        </div>
+        <div class="steps-box">
+          <div class="step"><div class="step-num">1</div><div class="step-text">Choose your payment method above</div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-text">Send money to the number/address shown below</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-text">Enter the amount and your Transaction ID, then submit</div></div>
+        </div>
+        <div class="deposit-form">
+          <div class="deposit-form-title"><i class="fas fa-paper-plane" style="color:var(--primary);"></i> Submit Deposit</div>
+          <label class="inp-label">Send Payment To</label>
+          <div class="number-display">
+            <input id="admin-number" class="number-display-val" value="Select a method above" readonly>
+            <button class="copy-btn" onclick="copyNumber()"><i class="fas fa-copy"></i> Copy</button>
+          </div>
+          <div class="inp-group">
+            <label class="inp-label">Amount (Min <span id="dep-min-label">$2</span>)</label>
+            <input id="dep-amt" type="number" placeholder="Enter amount in USD" class="inp">
+          </div>
+          <div class="inp-group" style="margin-bottom:20px;">
+            <label class="inp-label">Transaction ID / Hash</label>
+            <input id="dep-tx" type="text" placeholder="e.g. TXN12345ABC" class="inp" style="text-transform:uppercase;">
+          </div>
+          <button onclick="requestDeposit()" class="btn-primary">
+            <i class="fas fa-paper-plane"></i> Submit Request
+          </button>
+        </div>
+      </div>
 
-            <div id="withdraw-status-list" class="space-y-3 mt-8"></div>
-            
-            <button onclick="logout()" class="w-full py-5 text-rose-400 font-black glass rounded-2xl mt-12 border-rose-500/10">
-                <i class="fas fa-sign-out-alt mr-2"></i> LOGOUT SESSION
+      <!-- ── PROFILE ── -->
+      <div id="profile" class="page">
+        <div class="page-header">
+          <h3>My Profile</h3>
+        </div>
+        <div style="padding:0 16px;">
+          <div class="profile-hero">
+            <div class="profile-avatar">👤</div>
+            <div class="profile-name" id="u-name">Miner</div>
+            <div class="profile-phone" id="u-phone">Verified Account</div>
+            <div class="profile-stats-grid">
+              <div class="profile-stat">
+                <div class="profile-stat-v" id="ps-balance">$0</div>
+                <div class="profile-stat-l">Balance</div>
+              </div>
+              <div class="profile-stat">
+                <div class="profile-stat-v" id="ps-invested">$0</div>
+                <div class="profile-stat-l">Invested</div>
+              </div>
+              <div class="profile-stat">
+                <div class="profile-stat-v" id="ps-profit">$0</div>
+                <div class="profile-stat-l">Profit</div>
+              </div>
+            </div>
+          </div>
+          <!-- Referral -->
+          <div class="ref-card">
+            <div class="ref-card-top">
+              <span class="ref-card-title">Referral Link</span>
+              <span class="ref-badge">+10% Bonus</span>
+            </div>
+            <div class="ref-link-row">
+              <input id="ref-link-input" class="ref-link-input" readonly>
+              <button class="copy-btn" onclick="copyReferral()">Copy</button>
+            </div>
+          </div>
+          <!-- Withdrawal -->
+          <div class="withdraw-card">
+            <div class="withdraw-card-title">💸 Cash Out</div>
+            <div class="inp-group">
+              <label class="inp-label">Amount (Min $6)</label>
+              <input id="w-amt" type="number" placeholder="Enter amount" class="inp">
+            </div>
+            <div class="inp-group">
+              <label class="inp-label">Method</label>
+              <select id="w-method" class="inp">
+                <option value="">Select Method</option>
+                <option value="bKash">bKash</option>
+                <option value="Nagad">Nagad</option>
+                <option value="USDT">USDT (TRC20)</option>
+              </select>
+            </div>
+            <div class="inp-group" style="margin-bottom:20px;">
+              <label class="inp-label">Account / Wallet Number</label>
+              <input id="w-num" type="text" placeholder="Receiver number or wallet address" class="inp">
+            </div>
+            <button onclick="requestWithdraw()" class="btn-outline" style="background:rgba(255,255,255,0.05);">
+              <i class="fas fa-arrow-right"></i> Request Withdrawal
             </button>
+          </div>
         </div>
-
-        <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/5 flex justify-around p-5 z-50 rounded-t-[2.5rem] shadow-2xl">
-            <button onclick="navigate('home')" class="nav-btn p-3 nav-active" data-page="home"><i class="fas fa-th-large text-xl"></i></button>
-            <button onclick="navigate('portfolio')" class="nav-btn p-3 text-slate-500" data-page="portfolio"><i class="fas fa-microchip text-xl"></i></button>
-            <button onclick="navigate('deposit')" class="nav-btn p-3 text-slate-500" data-page="deposit"><i class="fas fa-plus-circle text-2xl gold-gradient text-white rounded-full w-12 h-12 flex items-center justify-center -translate-y-6 shadow-xl shadow-amber-500/20"></i></button>
-            <button onclick="navigate('profile')" class="nav-btn p-3 text-slate-500" data-page="profile"><i class="fas fa-user-astronaut text-xl"></i></button>
-        </nav>
-    </main>
-
-    <script>
-        // FIREBASE CONFIGURATION (Use your own config)
-        const firebaseConfig = { 
-            apiKey: "AIzaSyDXD_ANF89k7StmGJ1Xz55nGUOB3ajMoF4", 
-            authDomain: "smartinvestpro-c659f.firebaseapp.com", 
-            databaseURL: "https://smartinvestpro-c659f-default-rtdb.firebaseio.com", 
-            projectId: "smartinvestpro-c659f", 
-            storageBucket: "smartinvestpro-c659f.firebasestorage.app", 
-            messagingSenderId: "294616388438", 
-            appId: "1:294616388438:web:54250014b8625fb50c3cf7" 
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        let state = null;
-        let isLoginMode = true;
-        let currentMethod = null;
-
-        function closeNotice() { document.getElementById('notice-modal').style.display = 'none'; }
-        
-        function toggleAuthMode() { 
-            isLoginMode = !isLoginMode; 
-            document.getElementById('reg-fields').classList.toggle('hidden');
-            document.getElementById('auth-btn').innerText = isLoginMode ? "Login Account" : "Create Account";
-            document.getElementById('switch-auth').innerHTML = isLoginMode ? "Don't have an account? <span class='text-amber-500 font-bold'>Register Now</span>" : "Already have account? <span class='text-amber-500 font-bold'>Login</span>";
-        }
-
-        window.onload = async () => {
-            const savedPhone = localStorage.getItem('logged_phone');
-            if(savedPhone) {
-                const snap = await db.ref('users/' + savedPhone).once('value');
-                if(snap.exists()){ 
-                    state = snap.val(); 
-                    loginSuccess(); 
-                }
-            }
-        };
-
-        async function handleAuth() {
-            const mobile = document.getElementById('auth-mobile').value.trim();
-            const pin = document.getElementById('auth-pin').value.trim();
-            
-            if(mobile.length !== 11) return alert("Enter valid 11-digit number");
-            if(pin.length < 4) return alert("PIN must be 4 digits");
-
-            if(!isLoginMode) {
-                const name = document.getElementById('auth-name').value.trim();
-                if(!name) return alert("Full Name Required");
-                
-                const checkUser = await db.ref('users/' + mobile).once('value');
-                if(checkUser.exists()) return alert("User already exists!");
-
-                state = { 
-                    name, phone: mobile, pin, 
-                    userId: 'GM-'+Math.floor(100000+Math.random()*899999), 
-                    balance: 0, invested: 0, profit: 0, 
-                    myPlans: [], withdraws: [],
-                    lastClaim: Date.now() 
-                };
-                await db.ref('users/' + mobile).set(state);
-            } else {
-                const snap = await db.ref('users/' + mobile).once('value');
-                if(!snap.exists() || snap.val().pin !== pin) return alert("Wrong Credentials");
-                state = snap.val();
-            }
-            localStorage.setItem('logged_phone', mobile);
-            loginSuccess();
-        }
-
-        function loginSuccess() {
-            document.getElementById('auth-page').style.display = 'none';
-            document.getElementById('main-app').classList.remove('hidden');
-            
-            db.ref('users/' + state.phone).on('value', snap => { 
-                if(snap.exists()) {
-                    state = snap.val(); 
-                    refreshUI(); 
-                    checkAutoProfit(); 
-                }
-            });
-
-            db.ref('appSettings').on('value', s => {
-                const data = s.val() || {};
-                document.getElementById('notice-text').innerText = data.notice || "Welcome to GOLD-MINE Digital Era!";
-                document.getElementById('notice-modal').style.display = 'flex';
-                document.getElementById('tg-link').href = data.telegram || "#";
-                document.getElementById('wa-link').href = "https://wa.me/" + (data.whatsapp || "");
-            });
-
-            document.getElementById('ref-link').value = `https://goldmine-bd.com/ref=${state.phone}`;
-            navigate('home');
-        }
-
-        async function checkAutoProfit() {
-            if (!state.myPlans || state.myPlans.length === 0) return;
-            const now = Date.now();
-            const lastClaim = state.lastClaim || now;
-            const oneDay = 24 * 60 * 60 * 1000;
-            const daysPassed = Math.floor((now - lastClaim) / oneDay);
-
-            if (daysPassed >= 1) {
-                let dailyTotal = 0;
-                state.myPlans.forEach(p => dailyTotal += parseFloat(p.daily));
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>​🪙 GOLD-MINE BD PRO 🪙 </title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;900&display=swap');
-        
-        html, body { 
-            height: 100%; margin: 0; padding: 0; overflow: hidden; 
-            background: #020617; font-family: 'Outfit', sans-serif; color: #f8fafc;
-            user-select: none; -webkit-tap-highlight-color: transparent;
-        }
-
-        .app-frame { display: flex; flex-direction: column; height: 100vh; width: 100%; }
-        
-        .scroll-area { 
-            flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; 
-            padding-bottom: 120px; 
-        }
-        .scroll-area::-webkit-scrollbar { display: none; }
-
-        .glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); }
-        .gold-gradient { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); position: relative; overflow: hidden; }
-        
-        .btn-click:active { transform: scale(0.96); transition: 0.1s; }
-        .nav-active { color: #fbbf24; transform: translateY(-3px); text-shadow: 0 0 15px rgba(251, 191, 36, 0.4); }
-        
-        .page { display: none; }
-        .page.active { display: block; animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-        .plan-card {
-            background: linear-gradient(180deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.9) 100%);
-            border: 1px solid rgba(251, 191, 36, 0.15);
-            border-radius: 2rem;
-            padding: 1.5rem;
-            position: relative;
-        }
-        
-        input { user-select: text !important; }
-    </style>
-</head>
-<body>
-
-    <div class="app-frame">
-        <div id="notice-modal" class="hidden fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-6">
-            <div class="glass p-8 rounded-[2.5rem] max-w-sm w-full text-center border-amber-500/30 animate__animated animate__zoomIn">
-                <div class="w-20 h-20 gold-gradient rounded-full flex items-center justify-center text-white text-3xl mx-auto mb-6 shadow-2xl">
-                    <i class="fas fa-bullhorn"></i>
-                </div>
-                <h3 class="text-2xl font-black mb-2 text-white">Announcement</h3>
-                <p id="notice-text" class="text-slate-400 text-sm mb-8 leading-relaxed">System Update In Progress...</p>
-                <button onclick="closeNotice()" class="w-full py-4 gold-gradient text-white font-black rounded-2xl btn-click shadow-lg">I UNDERSTAND</button>
-            </div>
+        <!-- Withdraw History -->
+        <div class="withdraw-history-title">Withdrawal History</div>
+        <div id="withdraw-status-list" style="padding:0 0 4px;"></div>
+        <!-- Logout -->
+        <div style="padding:0 16px 24px;">
+          <button onclick="logout()" class="btn-danger">
+            <i class="fas fa-power-off"></i> Logout
+          </button>
         </div>
+      </div>
 
-        <section id="auth-page" class="page active h-screen flex flex-col items-center justify-center p-8">
-            <div class="w-24 h-24 gold-gradient rounded-[2rem] flex items-center justify-center text-white text-5xl mb-8 shadow-2xl animate__animated animate__bounceIn">
-                <i class="fas fa-gem"></i>
-            </div>
-            <h1 class="text-4xl font-black mb-1">GOLD-MINE <span class="text-amber-500">BD</span></h1>
-            <p class="text-slate-500 text-xs mb-10 tracking-widest uppercase">Digital Asset Mining</p>
-            
-            <div class="w-full max-w-sm space-y-4">
-                <div id="reg-fields" class="hidden">
-                    <input id="auth-name" type="text" placeholder="Full Name" class="w-full p-5 glass rounded-2xl outline-none focus:border-amber-500 text-white transition-all">
-                </div>
-                <input id="auth-mobile" type="tel" placeholder="Mobile Number" class="w-full p-5 glass rounded-2xl outline-none focus:border-amber-500 text-white transition-all">
-                <input id="auth-pin" type="password" placeholder="4-Digit PIN" maxlength="4" class="w-full p-5 glass rounded-2xl outline-none focus:border-amber-500 text-white transition-all">
-                
-                <button onclick="handleAuth()" id="auth-btn" class="w-full gold-gradient text-white font-black py-5 rounded-2xl shadow-xl uppercase btn-click tracking-widest">Login Access</button>
-                <p id="switch-auth" class="text-center text-xs text-slate-400 mt-6 cursor-pointer" onclick="toggleAuthMode()">
-                    Don't have an account? <span class="text-amber-500 font-bold ml-1">Register Now</span>
-                </p>
-            </div>
-        </section>
+    </div><!-- end scroll-area -->
 
-        <main id="main-app" class="hidden flex flex-col h-full">
-            <header class="glass p-6 sticky top-0 z-[100] flex justify-between items-center border-b border-white/5">
-                <div>
-                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Available Funds</p>
-                    <h2 class="text-3xl font-black text-white">৳ <span id="balance-display">0.00</span></h2>
-                </div>
-                <div class="text-right">
-                    <span id="user-id-badge" class="text-[10px] bg-amber-500/10 text-amber-500 font-black px-4 py-2 rounded-xl border border-amber-500/20">ID-XXXX</span>
-                </div>
-            </header>
+    <!-- Bottom Nav -->
+    <nav id="bottom-nav">
+      <button class="nav-item active" data-page="home" onclick="navigate('home')">
+        <i class="fas fa-th-large"></i>
+        <span>Home</span>
+      </button>
+      <button class="nav-item" data-page="portfolio" onclick="navigate('portfolio')">
+        <i class="fas fa-microchip"></i>
+        <span>Nodes</span>
+      </button>
+      <div class="nav-fab-wrap" onclick="navigate('deposit')">
+        <button class="nav-fab"><i class="fas fa-plus"></i></button>
+        <span class="nav-fab-label">Deposit</span>
+      </div>
+      <button class="nav-item" data-page="profile" onclick="navigate('profile')">
+        <i class="fas fa-user-circle"></i>
+        <span>Profile</span>
+      </button>
+    </nav>
 
-            <div class="scroll-area">
-                <div id="home" class="page active p-6">
-                    <div class="gold-gradient rounded-[2.5rem] p-8 mb-8 shadow-2xl relative overflow-hidden">
-                        <div class="relative z-10">
-                            <p class="text-amber-100/80 text-[10px] font-black uppercase tracking-widest mb-1">Mining Revenue</p>
-                            <h3 class="text-5xl font-black text-white mb-8">৳ <span id="profit-display">0.00</span></h3>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="bg-black/20 p-4 rounded-2xl">
-                                    <p class="text-[9px] text-amber-200 uppercase font-black">Investment</p>
-                                    <p class="font-black text-white text-lg">৳ <span id="invested-display">0.00</span></p>
-                                </div>
-                                <div class="bg-black/20 p-4 rounded-2xl text-center">
-                                    <p class="text-[9px] text-amber-200 uppercase font-black">Status</p>
-                                    <p class="font-black text-white text-[10px] mt-1 uppercase">Gold Member</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+  </div><!-- end main-app -->
+</div><!-- end app -->
 
-                    <h4 class="font-black text-lg mb-6 flex items-center gap-3">
-                        <span class="w-1.5 h-6 gold-gradient rounded-full"></span>
-                        Premium Mining Nodes
-                    </h4>
-                    <div id="plans-container" class="space-y-6"></div>
-                </div>
+<script>
+// ── Firebase ──
+const firebaseConfig = {
+  apiKey: "AIzaSyDXD_ANF89k7StmGJ1Xz55nGUOB3ajMoF4",
+  authDomain: "smartinvestpro-c659f.firebaseapp.com",
+  databaseURL: "https://smartinvestpro-c659f-default-rtdb.firebaseio.com",
+  projectId: "smartinvestpro-c659f",
+  storageBucket: "smartinvestpro-c659f.firebasestorage.app",
+  messagingSenderId: "294616388438",
+  appId: "1:294616388438:web:54250014b8625fb50c3cf7"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-                <div id="portfolio" class="page p-6">
-                    <h3 class="text-2xl font-black mb-8">My Active Nodes</h3>
-                    <div id="portfolio-list" class="space-y-4"></div>
-                </div>
+let state = null, isLoginMode = true, currentMethod = null, currentMethodData = null;
 
-                <div id="deposit" class="page p-6">
-                    <h3 class="text-2xl font-black mb-6 text-center">Recharge Wallet</h3>
-                    <div class="flex gap-3 mb-8">
-                        <button onclick="setMethod('bKash')" id="m-bkash" class="flex-1 py-4 glass rounded-2xl text-sm font-black btn-click">bKash</button>
-                        <button onclick="setMethod('Nagad')" id="m-nagad" class="flex-1 py-4 glass rounded-2xl text-sm font-black btn-click">Nagad</button>
-                    </div>
-                    <div class="glass p-8 rounded-[2.5rem] space-y-6">
-                        <div class="p-5 bg-white/5 rounded-2xl flex justify-between items-center border border-white/10">
-                            <input id="admin-number" value="Select Method" readonly class="bg-transparent font-black text-amber-500 outline-none text-lg">
-                            <button onclick="copyNumber()" class="gold-gradient text-white px-5 py-2.5 rounded-xl text-[10px] font-black btn-click">COPY</button>
-                        </div>
-                        <input id="dep-amt" type="number" placeholder="Enter Amount (Min 200)" class="w-full p-5 glass rounded-2xl outline-none text-white font-bold">
-                        <input id="dep-tx" type="text" placeholder="Transaction ID" class="w-full p-5 glass rounded-2xl outline-none text-white font-bold uppercase">
-                        <button onclick="requestDeposit()" class="w-full py-5 gold-gradient text-white font-black rounded-2xl shadow-xl btn-click uppercase tracking-widest">Verify Payment</button>
-                    </div>
-                </div>
+// ── Toast ──
+function toast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.className = `show ${type}`;
+  t.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':type==='error'?'times-circle':'info-circle'}"></i> ${msg}`;
+  setTimeout(() => t.className = type, 2800);
+}
 
-                <div id="profile" class="page p-6">
-                    <div class="glass p-8 rounded-[2.5rem] text-center mb-8 shadow-xl">
-                        <div class="w-20 h-20 gold-gradient rounded-full mx-auto mb-4 flex items-center justify-center text-3xl shadow-2xl">
-                            <i class="fas fa-user-astronaut"></i>
-                        </div>
-                        <h2 id="u-name" class="text-2xl font-black text-white">Miner</h2>
-                        <p id="u-phone" class="text-xs text-amber-500 font-bold tracking-widest mt-1">VERIFIED ACCOUNT</p>
-                    </div>
+// ── Notice ──
+function closeNotice() { document.getElementById('notice-modal').style.display='none'; }
 
-                    <div class="glass p-6 rounded-[2rem] mb-8 border border-amber-500/20">
-                        <div class="flex items-center justify-between mb-4">
-                            <h4 class="text-xs font-black uppercase text-slate-400 tracking-widest">Referral Link</h4>
-                            <span class="text-[9px] bg-green-500/20 text-green-500 px-2 py-1 rounded-md font-black">EARN 10%</span>
-                        </div>
-                        <div class="flex gap-2">
-                            <input id="ref-link-input" readonly class="bg-white/5 p-3 rounded-xl text-[10px] flex-1 outline-none text-slate-400 border border-white/5">
-                            <button onclick="copyReferral()" class="gold-gradient text-white px-5 rounded-xl text-[10px] font-black btn-click">COPY</button>
-                        </div>
-                    </div>
+// ── Auth Tab ──
+function switchTab(mode) {
+  isLoginMode = (mode === 'login');
+  document.getElementById('tab-login').classList.toggle('active', isLoginMode);
+  document.getElementById('tab-register').classList.toggle('active', !isLoginMode);
+  document.getElementById('reg-fields').style.display = isLoginMode ? 'none' : 'block';
+  document.getElementById('auth-btn-text').innerText = isLoginMode ? 'Login Access' : 'Create Account';
+}
 
-                    <div class="glass p-8 rounded-[2.5rem] space-y-6">
-                        <h4 class="font-black text-lg">Withdrawal Area</h4>
-                        <input id="w-amt" type="number" placeholder="Amount (Min 600)" class="w-full p-5 glass rounded-2xl outline-none">
-                        <input id="w-num" type="tel" placeholder="Receiver Number" class="w-full p-5 glass rounded-2xl outline-none">
-                        <button onclick="requestWithdraw()" class="w-full py-5 bg-white text-slate-900 font-black rounded-2xl btn-click uppercase tracking-widest">Cash Out</button>
-                    </div>
-                    
-                    <div id="withdraw-status-list" class="mt-8 space-y-3"></div>
-                    <button onclick="logout()" class="w-full py-5 text-rose-500 font-black glass rounded-2xl mt-12 border-rose-500/10 btn-click uppercase tracking-widest">Logout</button>
-                </div>
-            </div>
+// ── On Load ──
+window.onload = async () => {
+  const saved = localStorage.getItem('logged_phone');
+  if (saved) {
+    const snap = await db.ref('users/'+saved).once('value');
+    if (snap.exists()) { state = snap.val(); loginSuccess(); }
+    else localStorage.removeItem('logged_phone');
+  }
+};
 
-            <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/5 flex justify-around p-6 z-[1000] rounded-t-[2.5rem] shadow-2xl">
-                <button onclick="navigate('home')" class="nav-btn p-2 nav-active" data-page="home"><i class="fas fa-th-large text-xl"></i></button>
-                <button onclick="navigate('portfolio')" class="nav-btn p-2 text-slate-500" data-page="portfolio"><i class="fas fa-microchip text-xl"></i></button>
-                <button onclick="navigate('deposit')" class="nav-btn p-2 text-slate-500" data-page="deposit"><i class="fas fa-plus-circle text-2xl gold-gradient text-white rounded-full w-12 h-12 flex items-center justify-center -translate-y-5 shadow-xl shadow-amber-500/20"></i></button>
-                <button onclick="navigate('profile')" class="nav-btn p-2 text-slate-500" data-page="profile"><i class="fas fa-user-circle text-xl"></i></button>
-            </nav>
-        </main>
-    </div>
+// ── Handle Auth ──
+async function handleAuth() {
+  const mobile = document.getElementById('auth-mobile').value.trim();
+  const pin = document.getElementById('auth-pin').value.trim();
+  if (mobile.length < 10 || pin.length < 4) return toast('Enter valid details!', 'error');
+  if (!isLoginMode) {
+    const name = document.getElementById('auth-name').value.trim();
+    if (!name) return toast('Enter your name!', 'error');
+    const check = await db.ref('users/'+mobile).once('value');
+    if (check.exists()) return toast('Mobile already registered!', 'error');
+    const urlParams = new URLSearchParams(window.location.search);
+    const ref = urlParams.get('ref') || '';
+    state = {
+      name, phone:mobile, pin, userId:'GM-'+Math.floor(1000+Math.random()*8999),
+      balance:0, invested:0, profit:0, myPlans:[], withdraws:[],
+      lastClaim:Date.now(), referredBy:ref, joinDate:new Date().toLocaleDateString()
+    };
+    await db.ref('users/'+mobile).set(state);
+    if (ref) {
+      const refSnap = await db.ref('users/'+ref).once('value');
+      if (refSnap.exists()) {
+        const rd = refSnap.val();
+        await db.ref('users/'+ref).update({ balance: parseFloat(((rd.balance||0)+1).toFixed(2)) });
+      }
+    }
+  } else {
+    const snap = await db.ref('users/'+mobile).once('value');
+    if (!snap.exists() || snap.val().pin !== pin) return toast('Invalid credentials!', 'error');
+    state = snap.val();
+  }
+  localStorage.setItem('logged_phone', mobile);
+  loginSuccess();
+}
 
-    <script>
-        const firebaseConfig = { 
-            apiKey: "AIzaSyDXD_ANF89k7StmGJ1Xz55nGUOB3ajMoF4", 
-            authDomain: "smartinvestpro-c659f.firebaseapp.com", 
-            databaseURL: "https://smartinvestpro-c659f-default-rtdb.firebaseio.com", 
-            projectId: "smartinvestpro-c659f", 
-            storageBucket: "smartinvestpro-c659f.firebasestorage.app", 
-            messagingSenderId: "294616388438", 
-            appId: "1:294616388438:web:54250014b8625fb50c3cf7" 
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+// ── Login Success ──
+function loginSuccess() {
+  document.getElementById('auth-page').style.display = 'none';
+  const app = document.getElementById('main-app');
+  app.style.display = 'flex'; app.style.flexDirection = 'column'; app.style.height = '100%';
+  db.ref('users/'+state.phone).on('value', snap => {
+    if (snap.exists()) { state = snap.val(); refreshUI(); checkAutoProfit(); }
+  });
+  db.ref('appSettings').on('value', s => {
+    const d = s.val() || {};
+    document.getElementById('notice-text').innerText = d.notice || 'Welcome to GOLD-MINE PRO!';
+    document.getElementById('notice-modal').style.display = 'flex';
+    // Load banner
+    if (d.bannerUrl) {
+      const img = document.getElementById('banner-img');
+      const ph = document.getElementById('banner-placeholder');
+      img.src = d.bannerUrl;
+      img.style.display = 'block';
+      ph.style.display = 'none';
+    }
+  });
+  document.getElementById('ref-link-input').value = window.location.origin + window.location.pathname + '?ref=' + state.phone;
+  navigate('home');
+}
 
-        let state = null;
-        let isLoginMode = true;
-        let currentMethod = null;
+// ── Auto Profit ──
+async function checkAutoProfit() {
+  if (!state.myPlans || !state.myPlans.length) return;
+  const now = Date.now();
+  const daysPassed = Math.floor((now - (state.lastClaim||now)) / (24*60*60*1000));
+  if (daysPassed >= 1) {
+    let daily = 0;
+    state.myPlans.forEach(p => daily += parseFloat(p.daily||0));
+    const total = parseFloat((daily * daysPassed).toFixed(2));
+    await db.ref('users/'+state.phone).update({
+      balance: parseFloat(((state.balance||0)+total).toFixed(2)),
+      profit: parseFloat(((state.profit||0)+total).toFixed(2)),
+      lastClaim: now
+    });
+  }
+}
 
-        function closeNotice() { document.getElementById('notice-modal').style.display = 'none'; }
-        
-        function toggleAuthMode() { 
-            isLoginMode = !isLoginMode; 
-            document.getElementById('reg-fields').classList.toggle('hidden');
-            document.getElementById('auth-btn').innerText = isLoginMode ? "Login Access" : "Join Now";
+// ── Refresh UI ──
+function refreshUI() {
+  document.getElementById('balance-display').innerText = fmt(state.balance);
+  document.getElementById('profit-display').innerText = fmt(state.profit);
+  document.getElementById('invested-display').innerText = fmt(state.invested);
+  document.getElementById('user-id-badge').innerText = state.userId||'GM-XXXX';
+  document.getElementById('u-name').innerText = state.name||'Miner';
+  document.getElementById('u-phone').innerText = state.phone||'';
+  document.getElementById('ps-balance').innerText = '$'+fmt(state.balance);
+  document.getElementById('ps-invested').innerText = '$'+fmt(state.invested);
+  document.getElementById('ps-profit').innerText = '$'+fmt(state.profit);
+  const plans = state.myPlans||[];
+  document.getElementById('stat-nodes').innerText = plans.length;
+  document.getElementById('stat-withdraws').innerText = (state.withdraws||[]).length;
+  const roi = state.invested>0 ? ((state.profit/state.invested)*100).toFixed(1) : '0';
+  document.getElementById('stat-roi').innerText = roi+'%';
+  if (state.lastClaim) {
+    const d = new Date(state.lastClaim);
+    document.getElementById('stat-last').innerText = d.toLocaleDateString('en',{month:'short',day:'numeric'});
+  }
+  let daily = 0; plans.forEach(p => daily += parseFloat(p.daily||0));
+  document.getElementById('portfolio-daily').innerText = daily.toFixed(2);
+  document.getElementById('portfolio-count').innerText = plans.length;
+  renderPortfolio();
+  renderWithdrawStatus();
+}
+function fmt(v) { return parseFloat(v||0).toFixed(2); }
+
+// ── Render Plans ──
+function renderPlans() {
+  db.ref('appPlans').once('value', snap => {
+    const grid = document.getElementById('plans-grid');
+    const empty = document.getElementById('plans-empty');
+    if (!snap.exists()) { grid.innerHTML=''; empty.style.display='block'; return; }
+    empty.style.display = 'none';
+    let h = '';
+    snap.forEach(c => {
+      const p = c.val();
+      const total = (parseFloat(p.daily)*parseInt(p.days)).toFixed(2);
+      const roi = ((parseFloat(p.daily)*parseInt(p.days)/parseFloat(p.price)-1)*100).toFixed(0);
+      const hasImg = p.imageUrl && p.imageUrl.trim();
+      h += `
+      <div class="plan-card" onclick="buyPlan('${c.key}')">
+        <div class="plan-card-glow"></div>
+        <span class="plan-active-badge">Live</span>
+        <div class="plan-img-wrap">
+          ${hasImg
+            ? `<img src="${p.imageUrl}" class="plan-img" alt="${p.title}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" /><div class="plan-img-placeholder" style="display:none;">${p.icon||'💎'}</div>`
+            : `<div class="plan-img-placeholder">${p.icon||'💎'}</div>`
+          }
+        </div>
+        <div class="plan-name">${p.title}</div>
+        <div class="plan-price">Activate for $${parseFloat(p.price).toFixed(2)}</div>
+        <div class="plan-divider"></div>
+        <div class="plan-stats">
+          <div class="plan-stat-row">
+            <span class="plan-stat-k">Daily</span>
+            <span class="plan-stat-v gold">$${parseFloat(p.daily).toFixed(2)}</span>
+          </div>
+          <div class="plan-stat-row">
+            <span class="plan-stat-k">Duration</span>
+            <span class="plan-stat-v">${p.days} days</span>
+          </div>
+          <div class="plan-stat-row">
+            <span class="plan-stat-k">Total</span>
+            <span class="plan-stat-v">$${total}</span>
+          </div>
+          <div class="plan-stat-row">
+            <span class="plan-stat-k">ROI</span>
+            <span class="plan-stat-v green">+${roi}%</span>
+          </div>
+        </div>
+        <button class="plan-buy-btn"><i class="fas fa-bolt"></i> Activate</button>
+      </div>`;
+    });
+    grid.innerHTML = h;
+  });
+}
+
+// ── Buy Plan ──
+async function buyPlan(k) {
+  const p = (await db.ref('appPlans/'+k).once('value')).val();
+  if (!p) return toast('Plan not found!', 'error');
+  if (parseFloat(state.balance) >= parseFloat(p.price)) {
+    const plans = state.myPlans || [];
+    plans.push({ title:p.title, daily:p.daily, icon:p.icon||'💎', imageUrl:p.imageUrl||'', activatedAt:Date.now() });
+    await db.ref('users/'+state.phone).update({
+      balance: parseFloat((parseFloat(state.balance)-parseFloat(p.price)).toFixed(2)),
+      invested: parseFloat(((state.invested||0)+parseFloat(p.price)).toFixed(2)),
+      myPlans: plans, lastClaim: Date.now()
+    });
+    toast('Node Activated! Mining Started 🎉', 'success');
+    navigate('portfolio');
+  } else {
+    toast('Insufficient balance! Please deposit first.', 'error');
+    setTimeout(() => navigate('deposit'), 900);
+  }
+}
+
+// ── Portfolio ──
+function renderPortfolio() {
+  const list = state.myPlans || [];
+  if (!list.length) {
+    document.getElementById('portfolio-list').innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-microchip"></i>
+        <p>No active nodes yet.<br>Activate a plan to start mining.</p>
+      </div>`;
+    return;
+  }
+  document.getElementById('portfolio-list').innerHTML = [...list].reverse().map(i => {
+    const hasImg = i.imageUrl && i.imageUrl.trim();
+    return `
+    <div class="node-card">
+      <div class="node-img-wrap">
+        ${hasImg
+          ? `<img src="${i.imageUrl}" class="node-img" alt="${i.title}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><span class="node-icon-text" style="display:none;">${i.icon}</span>`
+          : `<span class="node-icon-text">${i.icon}</span>`
         }
+      </div>
+      <div class="node-info">
+        <div class="node-name">${i.title}</div>
+        <div class="node-sub">Mining Active</div>
+      </div>
+      <div class="node-right">
+        <div class="node-daily">$${parseFloat(i.daily).toFixed(2)}</div>
+        <div class="node-daily-label">per day</div>
+      </div>
+    </div>`;
+  }).join('');
+}
 
-        window.onload = async () => {
-            const savedPhone = localStorage.getItem('logged_phone');
-            if(savedPhone) {
-                const snap = await db.ref('users/' + savedPhone).once('value');
-                if(snap.exists()){ state = snap.val(); loginSuccess(); }
-            }
-        };
+// ── Navigate ──
+function navigate(id) {
+  document.querySelectorAll('#main-app .page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`[data-page="${id}"]`);
+  if (btn) btn.classList.add('active');
+  if (id === 'home') renderPlans();
+  if (id === 'deposit') loadDepositMethods();
+}
 
-        async function handleAuth() {
-            const mobile = document.getElementById('auth-mobile').value.trim();
-            const pin = document.getElementById('auth-pin').value.trim();
-            if(mobile.length !== 11 || pin.length < 4) return alert("Enter 11-digit mobile & 4-digit PIN");
-
-            if(!isLoginMode) {
-                const name = document.getElementById('auth-name').value.trim();
-                const check = await db.ref('users/' + mobile).once('value');
-                if(check.exists()) return alert("Mobile already registered!");
-                state = { 
-                    name, phone: mobile, pin, 
-                    userId: 'GM-'+Math.floor(1000+Math.random()*8999), 
-                    balance: 0, invested: 0, profit: 0, 
-                    myPlans: [], withdraws: [], lastClaim: Date.now() 
-                };
-                await db.ref('users/' + mobile).set(state);
-            } else {
-                const snap = await db.ref('users/' + mobile).once('value');
-                if(!snap.exists() || snap.val().pin !== pin) return alert("Invalid Credentials");
-                state = snap.val();
-            }
-            localStorage.setItem('logged_phone', mobile);
-            loginSuccess();
+async function loadDepositMethods() {
+  const methodsEl = document.getElementById('method-scroll');
+  methodsEl.innerHTML = `<div style="color:var(--text3);font-size:12px;padding:10px;">Loading methods...</div>`;
+  
+  const snap = await db.ref('depositMethods').once('value');
+  
+  if (!snap.exists()) {
+    methodsEl.innerHTML = `<div style="color:var(--text3);font-size:12px;padding:10px;">No methods found</div>`;
+    return;
+  }
+  
+  let h = '';
+  snap.forEach(c => {
+    const m = c.val();
+    if (!m.active) return;
+    const hasLogo = m.logoUrl && m.logoUrl.trim();
+    
+    // এখানে পরিবর্তন: JSON.stringify বাদ দিয়ে শুধু c.key পাঠানো হয়েছে
+    h += `
+    <div class="method-card" id="mc-${c.key}" onclick="fetchAndSetMethod('${c.key}')">
+      <div class="method-card-logo">
+        ${hasLogo
+          ? `<img src="${m.logoUrl}" onerror="this.style.display='none';">`
+          : `<span class="method-emoji">${m.icon||'💳'}</span>`
         }
+      </div>
+      <div class="method-card-name">${m.name}</div>
+      <div class="method-card-min">Min $${m.minDeposit||2}</div>
+    </div>`;
+  });
+  methodsEl.innerHTML = h;
+}
 
-        function loginSuccess() {
-            document.getElementById('auth-page').style.display = 'none';
-            document.getElementById('main-app').classList.remove('hidden');
-            db.ref('users/' + state.phone).on('value', snap => { 
-                if(snap.exists()) { state = snap.val(); refreshUI(); checkAutoProfit(); }
-            });
-            db.ref('appSettings').on('value', s => {
-                const d = s.val() || {};
-                document.getElementById('notice-text').innerText = d.notice || "Welcome to GOLD-MINE PRO!";
-                document.getElementById('notice-modal').style.display = 'flex';
-            });
-            // Generate Referral Link
-            const baseUrl = window.location.origin + window.location.pathname;
-            document.getElementById('ref-link-input').value = baseUrl + "?ref=" + state.phone;
-            navigate('home');
-        }
+// ── Set Method ──
+function setMethod(key, data) {
+  currentMethod = key;
+  currentMethodData = data;
+  document.querySelectorAll('.method-card').forEach(c => c.classList.remove('active'));
+  const el = document.getElementById('mc-'+key);
+  if (el) el.classList.add('active');
+  document.getElementById('admin-number').value = data.number || 'Not set';
+  document.getElementById('dep-min-label').innerText = '$' + (data.minDeposit || 2);
+}
 
-        async function checkAutoProfit() {
-            if (!state.myPlans) return;
-            const now = Date.now();
-            const daysPassed = Math.floor((now - (state.lastClaim || now)) / (24*60*60*1000));
-            if (daysPassed >= 1) {
-                let daily = 0; state.myPlans.forEach(p => daily += parseFloat(p.daily));
-                const total = daily * daysPassed;
-                await db.ref('users/' + state.phone).update({ 
-                    balance: (state.balance || 0) + total, 
-                    profit: (state.profit || 0) + total, 
-                    lastClaim: now 
-                });
-            }
-        }
+function copyNumber() {
+  const v = document.getElementById('admin-number').value;
+  navigator.clipboard.writeText(v).then(() => toast('Copied!', 'success'));
+}
+function copyReferral() {
+  const v = document.getElementById('ref-link-input').value;
+  navigator.clipboard.writeText(v).then(() => toast('Referral link copied!', 'success'));
+}
 
-        function refreshUI() {
-            document.getElementById('balance-display').innerText = (state.balance || 0).toFixed(2);
-            document.getElementById('profit-display').innerText = (state.profit || 0).toFixed(2);
-            document.getElementById('invested-display').innerText = (state.invested || 0).toFixed(2);
-            document.getElementById('user-id-badge').innerText = state.userId;
-            document.getElementById('u-name').innerText = state.name;
-            renderPortfolio(); renderWithdrawStatus();
-        }
+// ── Request Deposit ──
+async function requestDeposit() {
+  if (!currentMethod || !currentMethodData) return toast('Select a payment method!', 'error');
+  const amt = parseFloat(document.getElementById('dep-amt').value);
+  const tx = document.getElementById('dep-tx').value.trim();
+  const minDep = parseFloat(currentMethodData.minDeposit || 2);
+  if (isNaN(amt) || amt < minDep) return toast(`Minimum deposit is $${minDep}!`, 'error');
+  if (tx.length < 4) return toast('Enter valid Transaction ID!', 'error');
+  await db.ref('requests/deposits').push({
+    phone:state.phone, name:state.name, userId:state.userId,
+    amount:amt, tx:tx.toUpperCase(), method:currentMethodData.name,
+    status:'Pending', date:new Date().toLocaleString()
+  });
+  document.getElementById('dep-amt').value = '';
+  document.getElementById('dep-tx').value = '';
+  toast('Deposit request submitted! ✅', 'success');
+  setTimeout(() => navigate('home'), 1000);
+}
 
-        function renderPlans() {
-            db.ref('appPlans').once('value', snap => {
-                let h = '';
-                snap.forEach(c => {
-                    const p = c.val();
-                    h += `
-                    <div class="plan-card group">
-                        <div class="flex justify-between items-center mb-5">
-                            <div class="flex items-center gap-4">
-                                <div class="w-14 h-14 gold-gradient rounded-2xl flex items-center justify-center text-2xl shadow-lg">${p.icon || '💎'}</div>
-                                <div>
-                                    <h4 class="font-black text-white text-lg">${p.title}</h4>
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                                        <p class="text-[8px] text-green-500 font-bold uppercase tracking-widest">Online Node</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-[8px] text-slate-500 font-black uppercase">Daily Profit</p>
-                                <p class="text-xl font-black text-amber-500">৳${p.daily}</p>
-                            </div>
-                        </div>
-                        
-                        <div class="grid grid-cols-3 gap-2 mb-6">
-                            <div class="bg-white/5 p-3 rounded-xl text-center">
-                                <p class="text-[7px] text-slate-500 font-bold uppercase mb-1">Duration</p>
-                                <p class="text-xs font-black text-white">${p.days} Days</p>
-                            </div>
-                            <div class="bg-white/5 p-3 rounded-xl text-center">
-                                <p class="text-[7px] text-slate-500 font-bold uppercase mb-1">Total Return</p>
-                                <p class="text-xs font-black text-white">৳${p.daily * p.days}</p>
-                            </div>
-                            <div class="bg-white/5 p-3 rounded-xl text-center">
-                                <p class="text-[7px] text-slate-500 font-bold uppercase mb-1">Tax</p>
-                                <p class="text-xs font-black text-white">0%</p>
-                            </div>
-                        </div>
+// ── Request Withdraw ──
+async function requestWithdraw() {
+  const amt = parseFloat(document.getElementById('w-amt').value);
+  const num = document.getElementById('w-num').value.trim();
+  const method = document.getElementById('w-method').value;
+  if (!method) return toast('Select withdrawal method!', 'error');
+  if (isNaN(amt) || amt < 6) return toast('Minimum withdrawal is $6!', 'error');
+  if (amt > (state.balance||0)) return toast('Insufficient balance!', 'error');
+  if (!num) return toast('Enter receiver number/address!', 'error');
+  const ws = state.withdraws || [];
+  const r = { amount:amt, method, account:num, status:'Pending', date:new Date().toLocaleDateString() };
+  ws.push(r);
+  await db.ref('requests/withdraws').push({ ...r, phone:state.phone, name:state.name, userId:state.userId });
+  await db.ref('users/'+state.phone).update({
+    balance: parseFloat(((state.balance||0)-amt).toFixed(2)), withdraws:ws
+  });
+  document.getElementById('w-amt').value = '';
+  document.getElementById('w-num').value = '';
+  toast('Withdrawal request sent!', 'success');
+}
 
-                        <button onclick="buyPlan('${c.key}')" class="w-full gold-gradient text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.1em] btn-click shadow-xl">
-                            Activate Mining Node @ ৳${p.price}
-                        </button>
-                    </div>`;
-                });
-                document.getElementById('plans-container').innerHTML = h || "<p class='text-center opacity-20 py-10'>No Active Nodes</p>";
-            });
-        }
+// ── Withdraw Status ──
+function renderWithdrawStatus() {
+  const list = state.withdraws||[];
+  const el = document.getElementById('withdraw-status-list');
+  if (!list.length) {
+    el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px;">No withdrawal history yet</div>`;
+    return;
+  }
+  el.innerHTML = [...list].reverse().map(w => `
+    <div class="withdraw-item">
+      <div>
+        <div class="withdraw-item-name">$${parseFloat(w.amount).toFixed(2)}</div>
+        <div class="withdraw-item-sub">${w.method||'—'} · ${w.date}</div>
+      </div>
+      <span class="status-badge ${w.status==='Pending'?'status-pending':w.status==='Done'||w.status==='Approved'?'status-done':'status-rejected'}">${w.status}</span>
+    </div>`).join('');
+}
 
-        async function buyPlan(k) {
-            const p = (await db.ref('appPlans/' + k).once('value')).val();
-            if(state.balance >= p.price) {
-                const plans = state.myPlans || [];
-                plans.push({ title: p.title, daily: p.daily, icon: p.icon || '💎' });
-                await db.ref('users/' + state.phone).update({ 
-                    balance: state.balance - p.price, 
-                    invested: (state.invested || 0) + p.price, 
-                    myPlans: plans, lastClaim: Date.now() 
-                });
-                alert("Mining node successfully activated!"); navigate('portfolio');
-            } else { alert("Insufficient Balance!"); navigate('deposit'); }
-        }
+// --- নতুন মেথড সেট করার ফাংশন ---
+async function fetchAndSetMethod(key) {
+  if (!key) return;
+  try {
+    const snap = await db.ref('depositMethods/' + key).once('value');
+    const data = snap.val();
+    
+    if (!data) return;
 
-        function renderPortfolio() {
-            const list = state.myPlans || [];
-            document.getElementById('portfolio-list').innerHTML = list.map(i => `
-                <div class="glass p-5 rounded-[2rem] flex justify-between items-center border-white/5">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 gold-gradient rounded-2xl flex items-center justify-center text-xl shadow-lg">${i.icon}</div>
-                        <div>
-                            <h4 class="font-black text-xs text-white">${i.title}</h4>
-                            <p class="text-[8px] text-green-400 uppercase font-black animate-pulse flex items-center gap-1">
-                                <i class="fas fa-bolt"></i> Processing Hash
-                            </p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-[8px] text-slate-500 font-bold">INCOME</p>
-                        <p class="text-xs font-black text-white">৳${i.daily}/Day</p>
-                    </div>
-                </div>`).reverse().join('');
-        }
+    // গ্লোবাল ডাটা সেট করা
+    window.currentMethod = key;
+    window.currentMethodData = data;
 
-        function navigate(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.replace('nav-active', 'text-slate-500'));
-            const btn = document.querySelector(`[data-page="${id}"]`);
-            if(btn) btn.classList.replace('text-slate-500', 'nav-active');
-            if(id === 'home') renderPlans();
-        }
+    // কার্ডের ডিজাইন আপডেট (Active Class)
+    document.querySelectorAll('.method-card').forEach(card => card.classList.remove('active'));
+    const selectedEl = document.getElementById('mc-' + key);
+    if (selectedEl) selectedEl.classList.add('active');
 
-        function setMethod(m) {
-            currentMethod = m;
-            document.getElementById('m-bkash').className = 'flex-1 py-4 glass rounded-2xl text-sm font-black btn-click';
-            document.getElementById('m-nagad').className = 'flex-1 py-4 glass rounded-2xl text-sm font-black btn-click';
-            document.getElementById('m-'+m.toLowerCase()).classList.add('gold-gradient', 'text-white');
-            db.ref('appSettings').once('value', s => { 
-                document.getElementById('admin-number').value = s.val()[m.toLowerCase()] || 'No Number'; 
-            });
-        }
+    // অ্যাডমিন নাম্বার ইনপুট বক্সে সেট করা
+    const adminNumInput = document.getElementById('admin-number');
+    if (adminNumInput) {
+      adminNumInput.value = data.number || 'No Number';
+    }
 
-        function copyNumber() { navigator.clipboard.writeText(document.getElementById('admin-number').value); alert("Receiver Number Copied!"); }
-        function copyReferral() { navigator.clipboard.writeText(document.getElementById('ref-link-input').value); alert("Referral Link Copied!"); }
+    // মিনিমাম ডিপোজিট লেবেল আপডেট
+    const minLabel = document.getElementById('dep-min-label');
+    if (minLabel) {
+      minLabel.innerText = '$' + (data.minDeposit || 2);
+    }
+    
+    if (typeof toast === "function") toast(data.name + ' selected', 's');
+    
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
 
-        async function requestDeposit() {
-            const amt = parseFloat(document.getElementById('dep-amt').value);
-            const tx = document.getElementById('dep-tx').value.trim();
-            if(!currentMethod || isNaN(amt) || tx.length < 5) return alert("Fill deposit form correctly!");
-            await db.ref('requests/deposits').push({ 
-                phone: state.phone, name: state.name, 
-                amount: amt, tx, method: currentMethod, 
-                status: 'Pending', date: new Date().toLocaleString() 
-            });
-            alert("Deposit submitted! Wait for approval."); navigate('home');
-        }
+// ── Logout ──
+function logout() { 
+  localStorage.clear(); 
+  location.reload(); 
+}
 
-        async function requestWithdraw() {
-            const amt = parseFloat(document.getElementById('w-amt').value);
-            const num = document.getElementById('w-num').value.trim();
-            if(isNaN(amt) || amt < 600 || amt > state.balance || num.length !== 11) return alert("Invalid amount or wallet number!");
-            const ws = state.withdraws || [];
-            const r = { amount: amt, status: 'Pending', date: new Date().toLocaleDateString() };
-            ws.push(r);
-            await db.ref('requests/withdraws').push({ ...r, phone: state.phone });
-            await db.ref('users/' + state.phone).update({ balance: state.balance - amt, withdraws: ws });
-            alert("Withdrawal request sent!");
-        }
-
-        function renderWithdrawStatus() {
-            const list = state.withdraws || [];
-            document.getElementById('withdraw-status-list').innerHTML = list.map(w => `
-                <div class="glass p-5 rounded-2xl flex justify-between items-center">
-                    <div>
-                        <p class="text-xs font-black text-white">৳${w.amount}</p>
-                        <p class="text-[8px] text-slate-500 mt-0.5">${w.date}</p>
-                    </div>
-                    <span class="text-[9px] font-black uppercase px-3 py-1 rounded-full ${w.status === 'Pending' ? 'bg-amber-500/10 text-amber-500' : 'bg-green-500/10 text-green-500'}">
-                        ${w.status}
-                    </span>
-                </div>`).reverse().join('');
-        }
-
-        function logout() { localStorage.clear(); location.reload(); }
-    </script>
+// Allow text selection in inputs
+document.addEventListener('touchstart', e => {
+  if (e.target.tagName==='INPUT'||e.target.tagName==='SELECT'||e.target.tagName==='TEXTAREA') e.stopPropagation();
+}, {passive:true});
+</script>
 </body>
-</html>
+    </html>
