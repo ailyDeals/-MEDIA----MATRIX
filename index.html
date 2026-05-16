@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>​❖ ⸢MEDIA MATRIX⸧ ❖</title>
+<title> Media Matrix</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -45,17 +45,14 @@ html, body {
 }
 ::-webkit-scrollbar { display:none; }
 
-/* ── APP SHELL ── */
 #app { display:flex; flex-direction:column; height:100vh; width:100%; position:relative; overflow:hidden; }
 
-/* ── SCROLL ── */
 .scroll-area {
   flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
   padding-bottom:calc(var(--nav-h) + 16px);
   scroll-behavior:smooth;
 }
 
-/* ── PAGES ── */
 .page { display:none; }
 .page.active { display:block; animation:pageIn .3s cubic-bezier(.4,0,.2,1); }
 @keyframes pageIn { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
@@ -148,10 +145,6 @@ select.inp option { background:var(--bg3); }
   font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:var(--primary);
   letter-spacing:.5px;
 }
-.notif-btn {
-  width:38px; height:38px; border-radius:10px; background:var(--bg3); border:1px solid var(--border);
-  display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text2); font-size:15px;
-}
 
 /* ── BOTTOM NAV ── */
 #bottom-nav {
@@ -182,7 +175,6 @@ select.inp option { background:var(--bg3); }
 .nav-fab-label { font-family:'Outfit',sans-serif; font-size:9px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; color:var(--text3); margin-top:-10px; }
 
 /* ── HOME PAGE ── */
-/* Ticker */
 .ticker-bar {
   background:rgba(240,180,41,0.06); border-bottom:1px solid rgba(240,180,41,0.1);
   overflow:hidden; padding:8px 0;
@@ -199,7 +191,6 @@ select.inp option { background:var(--bg3); }
 .ticker-item.up { color:var(--green); }
 .ticker-item.down { color:var(--red); }
 
-/* Banner */
 .banner-wrap { margin:0 16px 16px; border-radius:var(--radius); overflow:hidden; position:relative; }
 .banner-img {
   width:100%; height:160px; object-fit:cover; display:block;
@@ -213,7 +204,6 @@ select.inp option { background:var(--bg3); }
 }
 .banner-placeholder i { font-size:28px; color:var(--primary); opacity:0.5; }
 
-/* Balance Card */
 .balance-hero {
   margin:0 16px 16px; border-radius:var(--radius); padding:22px;
   background:linear-gradient(135deg, #1a1b28 0%, #15162090 50%, #12131a 100%);
@@ -242,7 +232,6 @@ select.inp option { background:var(--bg3); }
 .balance-stat-value.green { color:var(--green); }
 .balance-stat-value.blue { color:var(--blue); }
 
-/* Quick Pills */
 .pills-wrap { display:flex; gap:10px; padding:0 16px 18px; overflow-x:auto; }
 .pill {
   flex-shrink:0; display:flex; align-items:center; gap:7px;
@@ -253,7 +242,6 @@ select.inp option { background:var(--bg3); }
 .pill-label { font-size:10px; font-weight:600; color:var(--text3); }
 .pill-value { font-size:12px; font-weight:800; color:var(--text); }
 
-/* Section Header */
 .sec-hdr { display:flex; justify-content:space-between; align-items:center; padding:0 16px 14px; }
 .sec-hdr-title { font-size:17px; font-weight:800; }
 .sec-hdr-badge {
@@ -261,7 +249,6 @@ select.inp option { background:var(--bg3); }
   background:var(--green-bg); color:var(--green); text-transform:uppercase; letter-spacing:.8px;
 }
 
-/* Plan Cards Grid */
 .plans-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:0 16px 8px; }
 .plan-card {
   border-radius:20px; padding:16px; position:relative; overflow:hidden;
@@ -421,6 +408,24 @@ select.inp option { background:var(--bg3); }
 .ref-link-input { flex:1; min-width:0; background:none; border:none; color:var(--text2); font-size:11px; outline:none; pointer-events:none; font-family:'JetBrains Mono',monospace; }
 .withdraw-card { margin:0 16px 16px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); padding:18px; }
 .withdraw-card-title { font-size:16px; font-weight:800; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+
+/* Withdraw Method Selector */
+.wmethod-scroll { display:flex; gap:8px; overflow-x:auto; padding-bottom:12px; margin-bottom:4px; }
+.wmethod-card {
+  flex-shrink:0; min-width:80px; border-radius:12px; padding:10px 8px; text-align:center;
+  background:var(--bg4); border:2px solid var(--border); cursor:pointer; transition:all .2s;
+}
+.wmethod-card.active { background:rgba(240,180,41,0.08); border-color:var(--primary); }
+.wmethod-logo {
+  width:32px; height:32px; border-radius:9px; margin:0 auto 6px;
+  display:flex; align-items:center; justify-content:center; overflow:hidden; font-size:16px;
+  background:var(--bg5);
+}
+.wmethod-logo img { width:100%; height:100%; object-fit:cover; border-radius:9px; }
+.wmethod-name { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.4px; color:var(--text2); }
+.wmethod-card.active .wmethod-name { color:var(--primary); }
+.wmethod-min { font-size:8px; color:var(--text3); margin-top:2px; font-weight:600; }
+
 .withdraw-history-title { font-size:14px; font-weight:800; padding:0 16px; margin-bottom:12px; }
 .withdraw-item {
   margin:0 16px 10px; background:var(--bg3); border:1px solid var(--border);
@@ -477,7 +482,7 @@ select.inp option { background:var(--bg3); }
   <div class="modal-box">
     <div class="modal-icon">📢</div>
     <h3 class="modal-title">Announcement</h3>
-    <p id="notice-text" class="modal-text">Welcome to GOLD-MINE PRO — Your Digital Mining Partner!</p>
+    <p id="notice-text" class="modal-text">Welcome to GOLD-MINE PRO!</p>
     <button onclick="closeNotice()" class="btn-primary">Got It &nbsp;<i class="fas fa-check"></i></button>
   </div>
 </div>
@@ -538,7 +543,6 @@ select.inp option { background:var(--bg3); }
 
       <!-- ── HOME ── -->
       <div id="home" class="page active">
-        <!-- Ticker -->
         <div class="ticker-bar">
           <div class="ticker-track">
             <span class="ticker-item up"><i class="fas fa-arrow-up" style="font-size:8px;"></i> BTC $67,420</span>
@@ -556,8 +560,7 @@ select.inp option { background:var(--bg3); }
           </div>
         </div>
 
-        <!-- Banner -->
-        <div class="banner-wrap" id="banner-wrap">
+        <div class="banner-wrap">
           <div class="banner-placeholder" id="banner-placeholder">
             <i class="fas fa-image"></i>
             <span>Banner Image</span>
@@ -565,7 +568,6 @@ select.inp option { background:var(--bg3); }
           <img id="banner-img" class="banner-img" src="" alt="Banner" style="display:none;" onerror="this.style.display='none'; document.getElementById('banner-placeholder').style.display='flex';">
         </div>
 
-        <!-- Balance Hero -->
         <div class="balance-hero">
           <div class="balance-label">Total Mining Revenue</div>
           <div class="balance-value"><span>$</span><span id="profit-display">0.00</span></div>
@@ -581,7 +583,6 @@ select.inp option { background:var(--bg3); }
           </div>
         </div>
 
-        <!-- Pills -->
         <div class="pills-wrap">
           <div class="pill">
             <div class="pill-icon"><i class="fas fa-server"></i></div>
@@ -601,7 +602,6 @@ select.inp option { background:var(--bg3); }
           </div>
         </div>
 
-        <!-- Plans -->
         <div class="sec-hdr">
           <h4 class="sec-hdr-title">Mining Nodes</h4>
           <span class="sec-hdr-badge">Live</span>
@@ -637,7 +637,7 @@ select.inp option { background:var(--bg3); }
       <div id="deposit" class="page">
         <div class="page-header">
           <h3>Recharge Wallet</h3>
-          <p>Select payment method & send funds</p>
+          <p>Select payment method &amp; send funds</p>
         </div>
         <div class="method-scroll" id="method-scroll">
           <div style="color:var(--text3);font-size:12px;padding:10px;">Loading methods...</div>
@@ -693,6 +693,7 @@ select.inp option { background:var(--bg3); }
               </div>
             </div>
           </div>
+
           <!-- Referral -->
           <div class="ref-card">
             <div class="ref-card-top">
@@ -704,24 +705,23 @@ select.inp option { background:var(--bg3); }
               <button class="copy-btn" onclick="copyReferral()">Copy</button>
             </div>
           </div>
+
           <!-- Withdrawal -->
           <div class="withdraw-card">
             <div class="withdraw-card-title">💸 Cash Out</div>
-            <div class="inp-group">
-              <label class="inp-label">Amount (Min $6)</label>
+
+            <!-- Dynamic Withdraw Methods -->
+            <label class="inp-label" style="margin-bottom:8px;">Select Withdrawal Method</label>
+            <div class="wmethod-scroll" id="wmethod-scroll">
+              <div style="color:var(--text3);font-size:11px;padding:8px;">Loading methods...</div>
+            </div>
+
+            <div class="inp-group" style="margin-top:4px;">
+              <label class="inp-label">Amount (Min $<span id="w-min-label">6</span>)</label>
               <input id="w-amt" type="number" placeholder="Enter amount" class="inp">
             </div>
-            <div class="inp-group">
-              <label class="inp-label">Method</label>
-              <select id="w-method" class="inp">
-                <option value="">Select Method</option>
-                <option value="bKash">bKash</option>
-                <option value="Nagad">Nagad</option>
-                <option value="USDT">USDT (TRC20)</option>
-              </select>
-            </div>
             <div class="inp-group" style="margin-bottom:20px;">
-              <label class="inp-label">Account / Wallet Number</label>
+              <label class="inp-label">Account / Wallet Address</label>
               <input id="w-num" type="text" placeholder="Receiver number or wallet address" class="inp">
             </div>
             <button onclick="requestWithdraw()" class="btn-outline" style="background:rgba(255,255,255,0.05);">
@@ -729,9 +729,11 @@ select.inp option { background:var(--bg3); }
             </button>
           </div>
         </div>
+
         <!-- Withdraw History -->
         <div class="withdraw-history-title">Withdrawal History</div>
         <div id="withdraw-status-list" style="padding:0 0 4px;"></div>
+
         <!-- Logout -->
         <div style="padding:0 16px 24px;">
           <button onclick="logout()" class="btn-danger">
@@ -780,6 +782,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 let state = null, isLoginMode = true, currentMethod = null, currentMethodData = null;
+let currentWithdrawMethod = null, currentWithdrawMethodData = null;
 
 // ── Toast ──
 function toast(msg, type='info') {
@@ -857,7 +860,6 @@ function loginSuccess() {
     const d = s.val() || {};
     document.getElementById('notice-text').innerText = d.notice || 'Welcome to GOLD-MINE PRO!';
     document.getElementById('notice-modal').style.display = 'flex';
-    // Load banner
     if (d.bannerUrl) {
       const img = document.getElementById('banner-img');
       const ph = document.getElementById('banner-placeholder');
@@ -1028,26 +1030,23 @@ function navigate(id) {
   if (btn) btn.classList.add('active');
   if (id === 'home') renderPlans();
   if (id === 'deposit') loadDepositMethods();
+  if (id === 'profile') loadWithdrawMethods();
 }
 
+// ── Load Deposit Methods ──
 async function loadDepositMethods() {
   const methodsEl = document.getElementById('method-scroll');
   methodsEl.innerHTML = `<div style="color:var(--text3);font-size:12px;padding:10px;">Loading methods...</div>`;
-  
   const snap = await db.ref('depositMethods').once('value');
-  
   if (!snap.exists()) {
     methodsEl.innerHTML = `<div style="color:var(--text3);font-size:12px;padding:10px;">No methods found</div>`;
     return;
   }
-  
   let h = '';
   snap.forEach(c => {
     const m = c.val();
     if (!m.active) return;
     const hasLogo = m.logoUrl && m.logoUrl.trim();
-    
-    // এখানে পরিবর্তন: JSON.stringify বাদ দিয়ে শুধু c.key পাঠানো হয়েছে
     h += `
     <div class="method-card" id="mc-${c.key}" onclick="fetchAndSetMethod('${c.key}')">
       <div class="method-card-logo">
@@ -1060,10 +1059,51 @@ async function loadDepositMethods() {
       <div class="method-card-min">Min $${m.minDeposit||2}</div>
     </div>`;
   });
-  methodsEl.innerHTML = h;
+  methodsEl.innerHTML = h || `<div style="color:var(--text3);font-size:12px;padding:10px;">No active methods</div>`;
 }
 
-// ── Set Method ──
+// ── Load Withdraw Methods (Dynamic from Firebase) ──
+async function loadWithdrawMethods() {
+  const el = document.getElementById('wmethod-scroll');
+  el.innerHTML = `<div style="color:var(--text3);font-size:11px;padding:8px;">Loading...</div>`;
+  const snap = await db.ref('withdrawMethods').once('value');
+  if (!snap.exists()) {
+    el.innerHTML = `<div style="color:var(--text3);font-size:11px;padding:8px;">No methods available</div>`;
+    return;
+  }
+  let h = '';
+  snap.forEach(c => {
+    const m = c.val();
+    if (!m.active) return;
+    const hasLogo = m.logoUrl && m.logoUrl.trim();
+    h += `
+    <div class="wmethod-card" id="wmc-${c.key}" onclick="selectWithdrawMethod('${c.key}')">
+      <div class="wmethod-logo">
+        ${hasLogo ? `<img src="${m.logoUrl}" onerror="this.style.display='none';">` : (m.icon||'💳')}
+      </div>
+      <div class="wmethod-name">${m.name}</div>
+      <div class="wmethod-min">Min $${m.minAmount||6}</div>
+    </div>`;
+  });
+  el.innerHTML = h || `<div style="color:var(--text3);font-size:11px;padding:8px;">No methods available</div>`;
+}
+
+// ── Select Withdraw Method ──
+async function selectWithdrawMethod(key) {
+  const snap = await db.ref('withdrawMethods/'+key).once('value');
+  const data = snap.val();
+  if (!data) return;
+  currentWithdrawMethod = key;
+  currentWithdrawMethodData = data;
+  document.querySelectorAll('.wmethod-card').forEach(c => c.classList.remove('active'));
+  const el = document.getElementById('wmc-'+key);
+  if (el) el.classList.add('active');
+  document.getElementById('w-min-label').innerText = data.minAmount || 6;
+  document.getElementById('w-amt').placeholder = `Min $${data.minAmount||6}`;
+  toast(data.name + ' selected', 'info');
+}
+
+// ── Set Deposit Method ──
 function setMethod(key, data) {
   currentMethod = key;
   currentMethodData = data;
@@ -1072,6 +1112,23 @@ function setMethod(key, data) {
   if (el) el.classList.add('active');
   document.getElementById('admin-number').value = data.number || 'Not set';
   document.getElementById('dep-min-label').innerText = '$' + (data.minDeposit || 2);
+}
+
+async function fetchAndSetMethod(key) {
+  if (!key) return;
+  try {
+    const snap = await db.ref('depositMethods/' + key).once('value');
+    const data = snap.val();
+    if (!data) return;
+    currentMethod = key;
+    currentMethodData = data;
+    document.querySelectorAll('.method-card').forEach(card => card.classList.remove('active'));
+    const selectedEl = document.getElementById('mc-' + key);
+    if (selectedEl) selectedEl.classList.add('active');
+    document.getElementById('admin-number').value = data.number || 'No Number';
+    document.getElementById('dep-min-label').innerText = '$' + (data.minDeposit || 2);
+    toast(data.name + ' selected', 'info');
+  } catch (error) { console.error("Error:", error); }
 }
 
 function copyNumber() {
@@ -1104,22 +1161,34 @@ async function requestDeposit() {
 
 // ── Request Withdraw ──
 async function requestWithdraw() {
+  if (!currentWithdrawMethod || !currentWithdrawMethodData) return toast('Select a withdrawal method!', 'error');
   const amt = parseFloat(document.getElementById('w-amt').value);
   const num = document.getElementById('w-num').value.trim();
-  const method = document.getElementById('w-method').value;
-  if (!method) return toast('Select withdrawal method!', 'error');
-  if (isNaN(amt) || amt < 6) return toast('Minimum withdrawal is $6!', 'error');
+  const minAmt = parseFloat(currentWithdrawMethodData.minAmount || 6);
+  if (isNaN(amt) || amt < minAmt) return toast(`Minimum withdrawal is $${minAmt}!`, 'error');
   if (amt > (state.balance||0)) return toast('Insufficient balance!', 'error');
   if (!num) return toast('Enter receiver number/address!', 'error');
   const ws = state.withdraws || [];
-  const r = { amount:amt, method, account:num, status:'Pending', date:new Date().toLocaleDateString() };
+  const r = {
+    amount:amt,
+    method:currentWithdrawMethodData.name,
+    account:num,
+    status:'Pending',
+    date:new Date().toLocaleDateString()
+  };
   ws.push(r);
-  await db.ref('requests/withdraws').push({ ...r, phone:state.phone, name:state.name, userId:state.userId });
+  await db.ref('requests/withdraws').push({
+    ...r, phone:state.phone, name:state.name, userId:state.userId
+  });
   await db.ref('users/'+state.phone).update({
     balance: parseFloat(((state.balance||0)-amt).toFixed(2)), withdraws:ws
   });
   document.getElementById('w-amt').value = '';
   document.getElementById('w-num').value = '';
+  currentWithdrawMethod = null;
+  currentWithdrawMethodData = null;
+  document.querySelectorAll('.wmethod-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('w-min-label').innerText = '6';
   toast('Withdrawal request sent!', 'success');
 }
 
@@ -1135,59 +1204,21 @@ function renderWithdrawStatus() {
     <div class="withdraw-item">
       <div>
         <div class="withdraw-item-name">$${parseFloat(w.amount).toFixed(2)}</div>
-        <div class="withdraw-item-sub">${w.method||'—'} · ${w.date}</div>
+        <div class="withdraw-item-sub">${w.method||'—'} · ${w.account||'—'} · ${w.date}</div>
       </div>
       <span class="status-badge ${w.status==='Pending'?'status-pending':w.status==='Done'||w.status==='Approved'?'status-done':'status-rejected'}">${w.status}</span>
     </div>`).join('');
 }
 
-// --- নতুন মেথড সেট করার ফাংশন ---
-async function fetchAndSetMethod(key) {
-  if (!key) return;
-  try {
-    const snap = await db.ref('depositMethods/' + key).once('value');
-    const data = snap.val();
-    
-    if (!data) return;
-
-    // গ্লোবাল ডাটা সেট করা
-    window.currentMethod = key;
-    window.currentMethodData = data;
-
-    // কার্ডের ডিজাইন আপডেট (Active Class)
-    document.querySelectorAll('.method-card').forEach(card => card.classList.remove('active'));
-    const selectedEl = document.getElementById('mc-' + key);
-    if (selectedEl) selectedEl.classList.add('active');
-
-    // অ্যাডমিন নাম্বার ইনপুট বক্সে সেট করা
-    const adminNumInput = document.getElementById('admin-number');
-    if (adminNumInput) {
-      adminNumInput.value = data.number || 'No Number';
-    }
-
-    // মিনিমাম ডিপোজিট লেবেল আপডেট
-    const minLabel = document.getElementById('dep-min-label');
-    if (minLabel) {
-      minLabel.innerText = '$' + (data.minDeposit || 2);
-    }
-    
-    if (typeof toast === "function") toast(data.name + ' selected', 's');
-    
-  } catch (error) {
-    console.error("Error:", error);
-  }
-}
-
 // ── Logout ──
-function logout() { 
-  localStorage.clear(); 
-  location.reload(); 
+function logout() {
+  localStorage.clear();
+  location.reload();
 }
 
-// Allow text selection in inputs
 document.addEventListener('touchstart', e => {
   if (e.target.tagName==='INPUT'||e.target.tagName==='SELECT'||e.target.tagName==='TEXTAREA') e.stopPropagation();
 }, {passive:true});
 </script>
 </body>
-    </html>
+</html>
